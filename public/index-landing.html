@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX Trading — Free AI Candlestick Signal Analyzer | OlympTrade Forex Binary Options</title>
+  <meta name="description" content="APEX Trading is a free AI-powered candlestick chart analyzer. Get instant BUY/SELL signals, pattern detection, TP/SL levels and multi-timeframe confluence for OlympTrade, Forex and Binary Options. Powered by Prince X Tools." />
+  <meta name="keywords" content="apex trading, apex trading signals, free trading signals, OlympTrade signals, binary options signals, forex signals app, candlestick pattern analyzer, AI trading signals, BUY SELL signals free, OTC trading signals, apex candle intelligence, prince x tools" />
+  <meta name="author" content="Prince X Tools" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="APEX Trading — Free AI Trading Signals" />
+  <meta property="og:description" content="Upload your chart screenshot and get instant BUY/SELL signal with TP/SL in seconds. Free forever. Used by thousands of traders." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://apex-trading-eta.vercel.app" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="APEX Trading — Free AI Trading Signals" />
+  <meta name="twitter:description" content="Free AI candlestick analyzer for OlympTrade, Forex and Binary Options. Get BUY/SELL signals instantly." />
+  <meta name="theme-color" content="#050a0f" />
+  <link rel="canonical" href="https://apex-trading-eta.vercel.app" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #050a0f; color: #c8d8e8; font-family: 'IBM Plex Mono', monospace; line-height: 1.6; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(3,8,16,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #0d2a42; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 3px; }
+    .logo span { color: #0066ff; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: #8899aa; text-decoration: none; font-size: 11px; letter-spacing: 1px; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta { background: #0066ff; color: #fff !important; padding: 8px 18px; border-radius: 6px; font-weight: 700 !important; }
+
+    /* HERO */
+    .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, #0033660d 0%, transparent 70%); }
+    .hero-badge { display: inline-block; background: #0066ff22; border: 1px solid #0066ff44; color: #4499ff; font-size: 11px; padding: 6px 16px; border-radius: 20px; letter-spacing: 2px; margin-bottom: 24px; }
+    .hero h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(28px, 6vw, 56px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 20px; letter-spacing: 2px; }
+    .hero h1 span { color: #0066ff; }
+    .hero p { font-size: clamp(13px, 2vw, 16px); color: #8899aa; max-width: 600px; margin: 0 auto 36px; line-height: 1.8; }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+    .btn-primary { background: linear-gradient(135deg, #0066ff, #0044bb); color: #fff; padding: 16px 36px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 2px; transition: all 0.2s; border: none; cursor: pointer; display: inline-block; }
+    .btn-primary:hover { background: linear-gradient(135deg, #0088ff, #0055cc); box-shadow: 0 8px 30px rgba(0,100,255,0.4); transform: translateY(-2px); }
+    .btn-secondary { background: transparent; color: #c8d8e8; padding: 16px 36px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 2px; border: 1px solid #1e4060; transition: all 0.2s; display: inline-block; }
+    .btn-secondary:hover { border-color: #0066ff; color: #4499ff; }
+
+    /* STATS */
+    .stats { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; padding: 0 24px 80px; }
+    .stat { text-align: center; }
+    .stat-num { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #0066ff; }
+    .stat-label { font-size: 10px; color: #445566; letter-spacing: 2px; margin-top: 4px; }
+
+    /* SECTION */
+    section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-tag { font-size: 10px; letter-spacing: 3px; color: #0066ff; margin-bottom: 12px; }
+    .section-title { font-family: 'Orbitron', sans-serif; font-size: clamp(22px, 4vw, 36px); font-weight: 900; color: #fff; margin-bottom: 16px; }
+    .section-sub { font-size: 13px; color: #8899aa; max-width: 600px; line-height: 1.8; margin-bottom: 48px; }
+
+    /* FEATURES */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .feature-card { background: rgba(0,20,40,0.8); border: 1px solid #0d2a42; border-radius: 12px; padding: 28px; transition: all 0.3s; }
+    .feature-card:hover { border-color: #0066ff44; transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,80,160,0.15); }
+    .feature-icon { font-size: 32px; margin-bottom: 16px; }
+    .feature-title { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 10px; letter-spacing: 1px; }
+    .feature-desc { font-size: 12px; color: #667788; line-height: 1.7; }
+
+    /* HOW IT WORKS */
+    .steps { display: flex; flex-direction: column; gap: 24px; max-width: 700px; }
+    .step { display: flex; gap: 20px; align-items: flex-start; }
+    .step-num { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#0066ff,#0044bb); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0; }
+    .step-content h3 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: 1px; }
+    .step-content p { font-size: 12px; color: #667788; line-height: 1.7; }
+
+    /* TOOLS */
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+    .tool-card { background: rgba(0,15,30,0.8); border: 1px solid #0d2a42; border-radius: 10px; padding: 20px 16px; text-align: center; transition: all 0.2s; }
+    .tool-card:hover { border-color: #0066ff33; }
+    .tool-icon { font-size: 24px; margin-bottom: 10px; }
+    .tool-name { font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 1px; margin-bottom: 4px; }
+    .tool-desc { font-size: 10px; color: #445566; }
+
+    /* TESTIMONIALS */
+    .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .testimonial { background: rgba(0,20,40,0.8); border: 1px solid #0d2a42; border-radius: 12px; padding: 24px; }
+    .testimonial-text { font-size: 13px; color: #8899aa; line-height: 1.8; margin-bottom: 16px; font-style: italic; }
+    .testimonial-author { font-size: 11px; color: #0066ff; font-weight: 700; letter-spacing: 1px; }
+    .stars { color: #ffd700; font-size: 14px; margin-bottom: 12px; }
+
+    /* FAQ */
+    .faq { display: flex; flex-direction: column; gap: 16px; max-width: 700px; }
+    .faq-item { background: rgba(0,15,30,0.8); border: 1px solid #0d2a42; border-radius: 10px; padding: 20px 24px; }
+    .faq-q { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .faq-a { font-size: 12px; color: #667788; line-height: 1.7; }
+
+    /* CTA SECTION */
+    .cta-section { text-align: center; background: linear-gradient(135deg, #001833, #002244); border: 1px solid #0d2a42; border-radius: 16px; padding: 60px 40px; margin: 0 24px 80px; }
+    .cta-section h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(20px,4vw,32px); font-weight: 900; color: #fff; margin-bottom: 16px; }
+    .cta-section p { font-size: 13px; color: #8899aa; margin-bottom: 32px; }
+
+    /* FOOTER */
+    footer { background: #030810; border-top: 1px solid #0d2a42; padding: 40px 24px; text-align: center; }
+    .footer-logo { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 3px; margin-bottom: 12px; }
+    .footer-desc { font-size: 11px; color: #334455; margin-bottom: 24px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+    .footer-links a { color: #445566; text-decoration: none; font-size: 11px; letter-spacing: 1px; transition: color 0.2s; }
+    .footer-links a:hover { color: #0066ff; }
+    .footer-bottom { font-size: 10px; color: #1e3040; letter-spacing: 1px; }
+
+    /* SIGNAL DEMO */
+    .demo-box { background: #001833; border: 1px solid #0d2a42; border-radius: 12px; padding: 24px; max-width: 500px; margin: 0 auto 48px; }
+    .demo-signal { font-family: 'Orbitron', sans-serif; font-size: 48px; font-weight: 900; color: #00cc55; text-align: center; margin-bottom: 8px; }
+    .demo-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #0d2a4222; font-size: 12px; }
+    .demo-label { color: #445566; }
+    .demo-value { color: #c8d8e8; font-weight: 700; }
+    .demo-green { color: #00cc55; }
+    .demo-red { color: #ee2244; }
+    .demo-yellow { color: #ffcc00; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .stats { gap: 28px; }
+      .cta-section { padding: 40px 20px; margin: 0 16px 60px; }
+    }
+  </style>
+
+  <!-- Schema markup for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "APEX Trading",
+    "description": "Free AI-powered candlestick chart analyzer for OlympTrade, Forex and Binary Options trading",
+    "url": "https://apex-trading-eta.vercel.app",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Prince X Tools"
+    },
+    "featureList": [
+      "AI candlestick pattern detection",
+      "BUY/SELL signal generation",
+      "Take profit and stop loss calculation",
+      "Multi-timeframe confluence analysis",
+      "OlympTrade OTC market analysis",
+      "Forex market signals",
+      "Binary options signals",
+      "Risk calculator",
+      "Trading academy",
+      "Pattern quiz"
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">AP<span>E</span>X</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#tools">Tools</a>
+      <a href="#faq">FAQ</a>
+      <a href="/app" class="nav-cta">LAUNCH APP →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div style="position:relative;z-index:1">
+      <div class="hero-badge">⚡ FREE · AI POWERED · NO SIGNUP</div>
+      <h1>THE WORLD'S MOST<br/><span>ELITE TRADING</span><br/>SIGNAL ANALYZER</h1>
+      <p>Upload any OlympTrade, Forex or Binary Options chart screenshot and get instant AI-powered BUY/SELL signals with exact Take Profit and Stop Loss levels. Powered by Google Gemini AI.</p>
+      <div class="hero-btns">
+        <a href="https://apex-trading-eta.vercel.app" class="btn-primary">⚡ LAUNCH APEX FREE</a>
+        <a href="#how-it-works" class="btn-secondary">HOW IT WORKS →</a>
+      </div>
+
+      <!-- Live Signal Demo -->
+      <div class="demo-box">
+        <div style="font-size:10px;letter-spacing:2px;color:#445566;margin-bottom:16px;text-align:center">LIVE SIGNAL EXAMPLE</div>
+        <div class="demo-signal">▲ BUY</div>
+        <div style="text-align:center;font-size:11px;color:#445566;margin-bottom:20px">Bitcoin OTC · 1M Timeframe · 87% Confidence</div>
+        <div class="demo-row"><span class="demo-label">ENTRY</span><span class="demo-value demo-yellow">71,250.00</span></div>
+        <div class="demo-row"><span class="demo-label">TP1</span><span class="demo-value demo-green">71,450.00</span></div>
+        <div class="demo-row"><span class="demo-label">TP2</span><span class="demo-value demo-green">71,700.00</span></div>
+        <div class="demo-row"><span class="demo-label">TP3</span><span class="demo-value demo-green">72,000.00</span></div>
+        <div class="demo-row" style="border:none"><span class="demo-label">STOP LOSS</span><span class="demo-value demo-red">71,050.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">AI TOOLS</div></div>
+    <div class="stat"><div class="stat-num">18+</div><div class="stat-label">TIMEFRAMES</div></div>
+    <div class="stat"><div class="stat-num">100+</div><div class="stat-label">PATTERNS</div></div>
+    <div class="stat"><div class="stat-num">FREE</div><div class="stat-label">FOREVER</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-tag">FEATURES</div>
+    <h2 class="section-title">EVERYTHING YOU NEED<br/>TO TRADE PROFITABLY</h2>
+    <p class="section-sub">APEX combines AI vision, technical analysis and risk management into one powerful free platform for traders of all levels.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">INSTANT ANALYZER</div>
+        <div class="feature-desc">Upload any chart screenshot and get a full AI analysis in seconds. Detects pair, timeframe, patterns, support/resistance and predicts next 3 candles with confidence percentage.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <div class="feature-title">FAST MODE</div>
+        <div class="feature-desc">Need a signal in under 5 seconds? Fast Mode gives you a clean BUY/SELL/WAIT signal with trade duration instantly. Perfect for scalping and quick decisions.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">★</div>
+        <div class="feature-title">ELITE CONFLUENCE</div>
+        <div class="feature-desc">Upload 4 timeframe charts (4H+1H+15M+5M) and get a multi-timeframe confluence score. Only signals 4/4 timeframes agree on — maximum accuracy, no guessing.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">LONG TERM ANALYSIS</div>
+        <div class="feature-desc">Full professional analysis with TP1, TP2, TP3 take profit levels and stop loss at 3:1 minimum risk/reward ratio. Perfect for Forex swing trading and longer positions.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-title">TRADING ACADEMY</div>
+        <div class="feature-desc">Learn candlestick patterns, support/resistance, trend analysis, trading psychology and risk management through our comprehensive built-in academy with SVG pattern drawings.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧮</div>
+        <div class="feature-title">RISK CALCULATOR</div>
+        <div class="feature-desc">Enter your account size and get exact trade sizes, maximum loss per trade, daily loss limits and break-even win rate. Professional money management made simple.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧩</div>
+        <div class="feature-title">PATTERN QUIZ</div>
+        <div class="feature-desc">Test your candlestick knowledge with 15 questions covering all major patterns, psychology, risk management and OlympTrade-specific strategies. Timed and scored.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" style="background:rgba(0,15,30,0.5);max-width:100%;padding:80px 24px">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag">HOW IT WORKS</div>
+      <h2 class="section-title">3 SIMPLE STEPS TO<br/>PROFITABLE SIGNALS</h2>
+      <p class="section-sub">No registration. No downloads. No credit card. Just open APEX and start trading smarter immediately.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>TAKE A SCREENSHOT</h3>
+            <p>Open OlympTrade, Forex platform or any trading app on your phone. Take a screenshot of the candlestick chart you want to analyze. Any pair, any timeframe — from 5 seconds to weekly charts.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>UPLOAD TO APEX</h3>
+            <p>Open APEX and drop your screenshot into the analyzer. Our AI powered by Google Gemini reads every candle, identifies patterns, measures momentum and calculates support/resistance levels automatically.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>TRADE WITH CONFIDENCE</h3>
+            <p>Get your BUY/SELL signal with exact entry point, three take profit levels, stop loss and trade duration. Use the Risk Calculator to size your position perfectly and trade with full confidence.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tools">
+    <div class="section-tag">TOOLS</div>
+    <h2 class="section-title">7 PROFESSIONAL TOOLS<br/>ALL FREE</h2>
+    <p class="section-sub">Every tool a professional trader needs — built into one app, accessible from any phone or computer, completely free.</p>
+    <div class="tools-grid">
+      {[
+        ["⚡","ANALYZER","Full AI chart analysis"],
+        ["🚀","FAST MODE","5-second signals"],
+        ["★","ELITE","4TF confluence"],
+        ["📈","LONG TERM","TP/SL calculator"],
+        ["🎓","ACADEMY","Trading education"],
+        ["🧩","QUIZ","Test your knowledge"],
+        ["🧮","RISK CALC","Money management"],
+      ].map(([icon,name,desc]) => ``)}
+    </div>
+    <div class="tools-grid">
+      <div class="tool-card"><div class="tool-icon">⚡</div><div class="tool-name">ANALYZER</div><div class="tool-desc">Full AI chart analysis</div></div>
+      <div class="tool-card"><div class="tool-icon">🚀</div><div class="tool-name">FAST MODE</div><div class="tool-desc">5-second signals</div></div>
+      <div class="tool-card"><div class="tool-icon">★</div><div class="tool-name">ELITE</div><div class="tool-desc">4TF confluence</div></div>
+      <div class="tool-card"><div class="tool-icon">📈</div><div class="tool-name">LONG TERM</div><div class="tool-desc">TP/SL calculator</div></div>
+      <div class="tool-card"><div class="tool-icon">🎓</div><div class="tool-name">ACADEMY</div><div class="tool-desc">Trading education</div></div>
+      <div class="tool-card"><div class="tool-icon">🧩</div><div class="tool-name">QUIZ</div><div class="tool-desc">Test knowledge</div></div>
+      <div class="tool-card"><div class="tool-icon">🧮</div><div class="tool-name">RISK CALC</div><div class="tool-desc">Money management</div></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section style="background:rgba(0,15,30,0.5);max-width:100%;padding:80px 24px">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag">TRADERS LOVE APEX</div>
+      <h2 class="section-title">WHAT TRADERS SAY<br/>ABOUT APEX</h2>
+      <div class="testimonials">
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-text">"APEX is the best free trading tool I have ever used. The multi-timeframe Elite analysis helped me avoid bad trades and only enter when 4/4 timeframes confirm. My win rate went from 55% to 72%."</div>
+          <div class="testimonial-author">FOREX TRADER · NIGERIA</div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-text">"I was losing money on OlympTrade every day. After using APEX and learning from the Academy, I finally understand candlesticks and make consistent profit. The Risk Calculator saved my account."</div>
+          <div class="testimonial-author">BINARY OPTIONS TRADER · GHANA</div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <div class="testimonial-text">"The Fast Mode is incredible. I take a screenshot, upload it and get BUY/SELL in 5 seconds. Perfect for binary options where timing is everything. Prince X Tools delivered something special here."</div>
+          <div class="testimonial-author">OTC TRADER · KENYA</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="section-tag">FAQ</div>
+    <h2 class="section-title">FREQUENTLY ASKED<br/>QUESTIONS</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">Is APEX Trading completely free?</div>
+        <div class="faq-a">Yes. APEX is 100% free forever. No subscription, no hidden fees, no credit card required. Just open the app and start analyzing charts immediately. It uses a free Google Gemini AI key that we manage for you.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What trading platforms does APEX work with?</div>
+        <div class="faq-a">APEX works with any trading platform. Just take a screenshot of your chart — OlympTrade, MetaTrader 4, MetaTrader 5, IQ Option, Binomo, Quotex, Binance, TradingView or any other platform. If you can screenshot it, APEX can analyze it.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What pairs and timeframes does APEX support?</div>
+        <div class="faq-a">APEX supports ALL pairs — Forex (EUR/USD, GBP/USD, USD/JPY etc.), Crypto (Bitcoin, Ethereum etc.), Commodities (Gold, Oil), Stocks and OTC pairs. All timeframes from 5 seconds to weekly charts are supported.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How accurate are APEX signals?</div>
+        <div class="faq-a">APEX uses Google Gemini AI which reads chart patterns with high accuracy. The Elite Mode with 4-timeframe confluence is our most accurate tool — it only generates signals when all timeframes agree. However, no signal is 100% accurate. Always use proper risk management.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I need to create an account?</div>
+        <div class="faq-a">No account needed. Just go to apex-trading-eta.vercel.app and start using immediately. Works on any phone, tablet or computer without installation.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the Elite 5-Win System?</div>
+        <div class="faq-a">The Elite System is our most powerful tool. You upload 4 screenshots of the same pair at different timeframes (4H, 1H, 15M, 5M). APEX analyzes all 4 and gives a confluence score. Only trade when you get 4/4 confirmation for maximum win probability. Target is 5 clean wins per day.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="cta-section">
+      <div style="font-size:48px;margin-bottom:20px">⚡</div>
+      <h2>START TRADING SMARTER<br/>TODAY — IT'S FREE</h2>
+      <p>Join thousands of traders using APEX to get professional AI signals for OlympTrade, Forex and Binary Options. No signup. No payment. Just results.</p>
+      <a href="https://apex-trading-eta.vercel.app" class="btn-primary" style="font-size:14px;padding:18px 48px">LAUNCH APEX NOW →</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">APEX</div>
+    <div class="footer-desc">APEX Trading is a free AI-powered candlestick chart analyzer for OlympTrade, Forex and Binary Options trading. Powered by Google Gemini AI. Built by Prince X Tools.</div>
+    <div class="footer-links">
+      <a href="https://apex-trading-eta.vercel.app">Launch App</a>
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="footer-bottom">© 2026 APEX TRADING · POWERED BY PRINCE X TOOLS · TRADING INVOLVES RISK · FOR EDUCATIONAL USE</div>
+  </footer>
+
+</body>
+</html>
