@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-const GEMINI_API_KEY = "AIzaSyC5D5qpIUQ8wXrMNddJoGvUiC4nRR5TRbY";
+const GEMINI_API_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const FAST_PROMPT = `You are an elite binary options signal engine. Analyze this OlympTrade chart screenshot instantly.

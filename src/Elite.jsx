@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-const GEMINI_API_KEY = "AIzaSyC5D5qpIUQ8wXrMNddJoGvUiC4nRR5TRbY";
+const GEMINI_API_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const ALL_TIMEFRAMES = ["1M","2M","3M","5M","10M","15M","30M","45M","1H","2H","3H","4H","6H","8H","12H","1D","3D","1W"];

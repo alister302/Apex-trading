@@ -6,7 +6,7 @@ import LongTerm from "./LongTerm";
 import Elite from "./Elite";
 import RiskCalc from "./RiskCalc";
 
-const GEMINI_API_KEY = "AIzaSyC5D5qpIUQ8wXrMNddJoGvUiC4nRR5TRbY";
+const GEMINI_API_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `You are APEX — an elite candlestick chart analyst for OlympTrade binary options trading across ALL pairs (Forex, Crypto, OTC, Commodities, Stocks) and ALL timeframes including 5-second scalping.
