@@ -5,6 +5,7 @@ import Fast from "./Fast";
 import LongTerm from "./LongTerm";
 import Elite from "./Elite";
 import RiskCalc from "./RiskCalc";
+import LiveSignals from "./LiveSignals";
 
 const GEMINI_API_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -132,6 +133,7 @@ export default function App() {
     { id: "longterm", label: "📈 LONG TERM" },
     { id: "elite", label: "★ ELITE" },
     { id: "risk", label: "🧮 RISK" },
+    { id: "live", label: "📡 LIVE" },
   ];
 
   return (
@@ -193,6 +195,7 @@ export default function App() {
         {tab === "longterm" && <LongTerm dark={dark} />}
         {tab === "elite" && <Elite dark={dark} />}
         {tab === "risk" && <RiskCalc dark={dark} />}
+      {tab === "live" && <LiveSignals dark={dark} />}
 
         {tab === "analyzer" && (
           <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", padding: "20px 16px", display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
