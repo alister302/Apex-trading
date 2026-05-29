@@ -5,6 +5,7 @@ import Fast from "./Fast";
 import LongTerm from "./LongTerm";
 import Elite from "./Elite";
 import RiskCalc from "./RiskCalc";
+import Splash from "./Splash";
 import LiveSignals from "./LiveSignals";
 
 const GEMINI_API_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
@@ -50,6 +51,7 @@ Respond ONLY with this exact JSON (no markdown, no extra text):
 }`;
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [dark, setDark] = useState(true);
   const [tab, setTab] = useState("analyzer");
   const [image, setImage] = useState(null);
@@ -137,6 +139,8 @@ export default function App() {
   ];
 
   return (
+    <>
+    {showSplash && <Splash onDone={() => setShowSplash(false)} />}
     <div style={{ height: "100vh", background: t.bg, color: t.text, fontFamily: "'IBM Plex Mono', monospace", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap');
@@ -161,7 +165,7 @@ export default function App() {
               <span style={{ fontSize: 14, color: "#fff" }}>▲</span>
             </div>
             <div>
-              <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 15, fontWeight: 900, color: dark ? "#fff" : "#0044bb", letterSpacing: 3 }}>APEX</div>
+              <div style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 15, fontWeight: 900, color: dark ? "#fff" : "#0044bb", letterSpacing: 3 }}>APEX <span style={{ color: "#ffd700", fontSize: 14 }}>FX</span>/div>
               <div style={{ fontSize: 8, letterSpacing: 2, color: t.textDim }}>CANDLE INTELLIGENCE</div>
             </div>
           </div>
@@ -359,4 +363,5 @@ export default function App() {
       </div>
     </div>
   );
+    </>
 }
