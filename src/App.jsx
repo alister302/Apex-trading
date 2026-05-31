@@ -7,6 +7,8 @@ import Elite from "./Elite";
 import RiskCalc from "./RiskCalc";
 import LiveSignals from "./LiveSignals";
 import Splash from "./Splash";
+import Auth from "./Auth";
+import { supabase } from "./supabase";
 
 const GEMINI_API_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -52,6 +54,8 @@ Respond ONLY with this exact JSON (no markdown, no extra text):
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [dark, setDark] = useState(true);
   const [tab, setTab] = useState("analyzer");
   const [image, setImage] = useState(null);
@@ -78,6 +82,15 @@ export default function App() {
     histBg: dark ? "rgba(0,15,30,0.8)" : "#f8fbff",
   };
 
+  useState(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data?.session?.user || null);
+      setAuthChecked(true);
+    });
+    supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user || null);
+    });
+  });
   const processFile = (file) => {
     if (!file || !file.type.startsWith("image/")) return;
     setImageMime(file.type || "image/png");
@@ -134,8 +147,9 @@ export default function App() {
   return (
     <>
       {showSplash && <Splash onDone={() => setShowSplash(false)} />}
+      {!showSplash && !user && authChecked && <Auth onLogin={setUser} />}
 
-      <div style={{ height: "100vh", background: t.bg, color: t.text, fontFamily: "'IBM Plex Mono', monospace", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {!showSplash && user && <div style={{ height: "100vh", background: t.bg, color: t.text, fontFamily: "'IBM Plex Mono', monospace", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap');
           * { box-sizing: border-box; margin: 0; padding: 0; }
