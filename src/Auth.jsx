@@ -72,9 +72,9 @@ export default function Auth({ onLogin }) {
             <span style={{ fontSize:30, color:"#fff" }}>▲</span>
           </div>
           <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:24, fontWeight:900, color:"#fff", letterSpacing:4 }}>
-            APEX <span style={{ color:"#ffd700" }}>FX</span>
+            PRINCEX <span style={{ color:"#ffd700" }}>ACADEMY</span>
           </div>
-          <div style={{ fontSize:9, color:"#2a4060", letterSpacing:3, marginTop:5 }}>CANDLE INTELLIGENCE SYSTEM</div>
+          <div style={{ fontSize:9, color:"#2a4060", letterSpacing:3, marginTop:5 }}>TRADING SIGNALS PLATFORM</div>
         </div>
 
         <div style={{ fontSize:11, fontWeight:700, color:"#4499ff", letterSpacing:2, marginBottom:20, textAlign:"center" }}>
@@ -119,7 +119,7 @@ export default function Auth({ onLogin }) {
           {mode==="forgot" && <button className="link" onClick={()=>{setMode("login");reset();}} style={{ fontSize:11, color:"#4499ff", fontWeight:700 }}>← Back to sign in</button>}
         </div>
 
-        <div style={{ marginTop:24, fontSize:8, color:"#1a2a3a", textAlign:"center", letterSpacing:1 }}>APEX FX · PRINCE X TOOLS · TRADING INVOLVES RISK</div>
+        <div style={{ marginTop:24, fontSize:8, color:"#1a2a3a", textAlign:"center", letterSpacing:1 }}>PRINCEX ACADEMY · PRINCE X TOOLS · TRADING INVOLVES RISK</div>
       </div>
     </div>
   );

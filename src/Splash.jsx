@@ -61,7 +61,7 @@ export default function Splash({ onDone }) {
   // Phase timeline
   useEffect(() => {
     const statuses = [
-      [0,    "INITIALIZING APEX FX..."],
+      [0,    "INITIALIZING PRINCEX ACADEMY..."],
       [600,  "LOADING MARKET DATA..."],
       [1200, "CONNECTING TO SIGNALS..."],
       [1800, "SCANNING INDICATORS..."],
@@ -188,14 +188,14 @@ export default function Splash({ onDone }) {
             letterSpacing:6,
             textShadow:"0 0 20px #0066ff88, 0 0 40px #0066ff44",
           }}>
-            APEX <span style={{ color:"#ffd700" }}>FX</span>
+            PRINCEX <span style={{ color:"#ffd700" }}>ACADEMY</span>
           </div>
           <div style={{
             fontFamily:"'IBM Plex Mono',monospace",
             fontSize:10, letterSpacing:4,
             color:"#334455", marginTop:4,
           }}>
-            CANDLE INTELLIGENCE SYSTEM
+            TRADING SIGNALS PLATFORM
           </div>
         </div>
 

@@ -161,7 +161,7 @@ export default function Subscription({ user, sub, onSubscribed, dark }) {
         {/* Header */}
         <div style={{ textAlign:"center", marginBottom:22 }}>
           <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:20, fontWeight:900, color:dark?"#fff":"#001133", letterSpacing:3, marginBottom:5 }}>
-            APEX <span style={{ color:"#ffd700" }}>FX</span> PREMIUM
+            PRINCEX <span style={{ color:"#ffd700" }}>ACADEMY</span> PREMIUM
           </div>
           <div style={{ fontSize:10, color:t.muted }}>Professional signals · Live scanner · Sniper analysis</div>
         </div>
@@ -219,7 +219,7 @@ export default function Subscription({ user, sub, onSubscribed, dark }) {
           <div className="fade-in" style={{ background:dark?"#001a0d":"#e8fff3", border:"2px solid #00dd5544", borderRadius:14, padding:"28px 20px", marginBottom:16, textAlign:"center" }}>
             <div style={{ fontSize:52, marginBottom:12 }}>🎉</div>
             <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:"#00dd55", marginBottom:8 }}>PAYMENT SUCCESSFUL!</div>
-            <div style={{ fontSize:12, color:t.muted }}>Your {plan?.name} plan is now active. Enjoy APEX FX Premium!</div>
+            <div style={{ fontSize:12, color:t.muted }}>Your {plan?.name} plan is now active. Enjoy PRINCEX ACADEMY Premium!</div>
           </div>
         )}
 
