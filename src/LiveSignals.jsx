@@ -119,7 +119,7 @@ export default function LiveSignals({ dark }) {
     setManualLoading(true);
     setManualResult(null);
     try {
-      const res = await fetch(`${SERVER}/analyze?symbol=${encodeURIComponent(manualPair)}&interval=${manualTF}&entry_type=${entryType}`);
+      const res = await fetch(`${SERVER}/signals/analyze?symbol=${encodeURIComponent(manualPair)}&interval=${manualTF}&entry_type=${entryType}`);
       const data = await res.json();
       setManualResult(data);
     } catch(e) { setManualResult({ error: e.message }); }
