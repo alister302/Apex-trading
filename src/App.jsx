@@ -324,7 +324,7 @@ export default function App() {
           {tab==="longterm" && <LongTerm dark={dark} />}
           {tab==="elite" && <Elite dark={dark} />}
           {tab==="risk" && <RiskCalc dark={dark} />}
-          {tab==="live" && <LiveSignals dark={dark} />}
+          {tab==="live" && <LiveSignals dark={dark} isPremium={true} isAdmin={true} />}
 
           {tab==="analyzer" && (
             <div style={{maxWidth:1100,margin:"0 auto",width:"100%",padding:"14px",display:"grid",gridTemplateColumns:"1fr 260px",gap:14}}>
