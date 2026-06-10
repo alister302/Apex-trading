@@ -171,7 +171,7 @@ export default function App() {
     {id:"longterm",label:"📈 LONG TERM",premium:true},
     {id:"elite",label:"★ ELITE",premium:true},
     {id:"risk",label:"🧮 RISK",premium:false},
-    {id:"live",label:"📡 LIVE",premium:true},
+    {id:"live",label:"📡 LIVE",premium:false},
   ];
 
   if (splash) return <Splash onDone={() => setSplash(false)} />;
