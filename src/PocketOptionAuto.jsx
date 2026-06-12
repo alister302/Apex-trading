@@ -2,191 +2,153 @@ import { useState, useEffect, useRef } from "react";
 
 const SERVER = "https://apex-server-09p7.onrender.com";
 
-const PAIRS = [
-  "EUR/USD","GBP/USD","USD/JPY","AUD/USD",
-  "USD/CAD","EUR/GBP","USD/CHF","EUR/JPY",
-  "XAU/USD","BTC/USD","ETH/USD",
+const ALL_PAIRS = [
+  { symbol:"EUR/USD", flag:"🇪🇺🇺🇸" }, { symbol:"CAD/JPY", flag:"🇨🇦🇯🇵" },
+  { symbol:"GBP/AUD", flag:"🇬🇧🇦🇺" }, { symbol:"EUR/GBP", flag:"🇪🇺🇬🇧" },
+  { symbol:"EUR/CAD", flag:"🇪🇺🇨🇦" }, { symbol:"GBP/CAD", flag:"🇬🇧🇨🇦" },
+  { symbol:"GBP/JPY", flag:"🇬🇧🇯🇵" }, { symbol:"AUD/USD", flag:"🇦🇺🇺🇸" },
+  { symbol:"CHF/JPY", flag:"🇨🇭🇯🇵" }, { symbol:"AUD/CHF", flag:"🇦🇺🇨🇭" },
+  { symbol:"GBP/CHF", flag:"🇬🇧🇨🇭" }, { symbol:"AUD/CAD", flag:"🇦🇺🇨🇦" },
+  { symbol:"GBP/USD", flag:"🇬🇧🇺🇸" }, { symbol:"USD/JPY", flag:"🇺🇸🇯🇵" },
+  { symbol:"USD/CHF", flag:"🇺🇸🇨🇭" }, { symbol:"USD/CAD", flag:"🇺🇸🇨🇦" },
+  { symbol:"EUR/JPY", flag:"🇪🇺🇯🇵" }, { symbol:"EUR/AUD", flag:"🇪🇺🇦🇺" },
+  { symbol:"EUR/NZD", flag:"🇪🇺🇳🇿" }, { symbol:"EUR/CHF", flag:"🇪🇺🇨🇭" },
+  { symbol:"AUD/JPY", flag:"🇦🇺🇯🇵" }, { symbol:"AUD/NZD", flag:"🇦🇺🇳🇿" },
+  { symbol:"CAD/CHF", flag:"🇨🇦🇨🇭" }, { symbol:"NZD/USD", flag:"🇳🇿🇺🇸" },
+  { symbol:"NZD/JPY", flag:"🇳🇿🇯🇵" }, { symbol:"NZD/CAD", flag:"🇳🇿🇨🇦" },
+  { symbol:"NZD/CHF", flag:"🇳🇿🇨🇭" }, { symbol:"XAU/USD", flag:"🥇"     },
+  { symbol:"BTC/USD", flag:"₿"       }, { symbol:"ETH/USD", flag:"Ξ"       },
 ];
 
 function BuyerBar({ buyers, sellers, dark }) {
+  const diff = Math.abs(buyers - sellers);
+  const dominant = buyers > sellers ? "BUY" : "SELL";
+  const strength = diff >= 20 ? "Strong" : diff >= 10 ? "Moderate" : "Slight";
   return (
     <div style={{ marginBottom:10 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-        <span style={{ fontSize:10, color:"#00dd55", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>
-          👥 BUYERS {buyers}%
-        </span>
-        <span style={{ fontSize:10, color:"#ff2244", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>
-          SELLERS {sellers}% 👥
-        </span>
+      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+        <span style={{ fontSize:10, color:"#00dd55", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>👥 BUYERS {buyers}%</span>
+        <span style={{ fontSize:10, color:"#ff2244", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>SELLERS {sellers}% 👥</span>
       </div>
-      <div style={{ height:10, background:dark?"#0a1520":"#e0eaf4", borderRadius:5, overflow:"hidden", display:"flex", position:"relative" }}>
-        <div style={{ width:`${buyers}%`, background:"linear-gradient(90deg,#00aa44,#00dd55)", borderRadius:"5px 0 0 5px", transition:"width 0.5s" }} />
-        <div style={{ width:`${sellers}%`, background:"linear-gradient(90deg,#dd2244,#ff2244)", borderRadius:"0 5px 5px 0", transition:"width 0.5s" }} />
+      <div style={{ height:12, background:dark?"#0a1520":"#e0eaf4", borderRadius:6, overflow:"hidden", display:"flex" }}>
+        <div style={{ width:`${buyers}%`, background:"linear-gradient(90deg,#00aa44,#00dd55)", transition:"width 0.6s", display:"flex", alignItems:"center", justifyContent:"center" }}>
+          {buyers > 30 && <span style={{ fontSize:8, color:"#fff", fontWeight:700 }}>{buyers}%</span>}
+        </div>
+        <div style={{ width:`${sellers}%`, background:"linear-gradient(90deg,#dd2244,#ff2244)", transition:"width 0.6s", display:"flex", alignItems:"center", justifyContent:"center" }}>
+          {sellers > 30 && <span style={{ fontSize:8, color:"#fff", fontWeight:700 }}>{sellers}%</span>}
+        </div>
       </div>
-      <div style={{ textAlign:"center", marginTop:4, fontSize:9, color:dark?"#445566":"#778899", fontFamily:"'IBM Plex Mono',monospace" }}>
-        {buyers > sellers ? `${buyers-sellers}% more buyers — ${buyers>=70?"Strong BUY pressure":buyers>=60?"Moderate BUY":"Slight BUY bias"}` :
-         sellers > buyers ? `${sellers-buyers}% more sellers — ${sellers>=70?"Strong SELL pressure":sellers>=60?"Moderate SELL":"Slight SELL bias"}` :
-         "Market balanced — no clear direction"}
+      <div style={{ textAlign:"center", marginTop:3, fontSize:9, color:dominant==="BUY"?"#00dd55":"#ff2244", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>
+        {strength} {dominant} pressure — {diff}% {dominant==="BUY"?"more buyers":"more sellers"}
       </div>
     </div>
   );
 }
 
-function CandlePredict({ candle, dark }) {
-  const isUp = candle.direction === "UP";
-  const color = isUp ? "#00dd55" : "#ff2244";
-  const bg = isUp ? (dark?"#001a0d":"#e8fff3") : (dark?"#1a0005":"#fff0f3");
-
+function CandleCard({ candle, dark }) {
+  const up = candle.direction === "UP";
+  const color = up ? "#00dd55" : "#ff2244";
   return (
-    <div style={{ background:bg, border:`2px solid ${color}33`, borderRadius:10, padding:"12px 10px", borderTop:`3px solid ${color}` }}>
+    <div style={{ background:up?(dark?"#001a0d":"#e8fff3"):(dark?"#1a0005":"#fff0f3"), border:`2px solid ${color}33`, borderRadius:10, padding:"12px 10px", borderTop:`4px solid ${color}` }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
-        <span style={{ fontSize:9, color:dark?"#667788":"#556677", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>
-          CANDLE #{candle.number}
-        </span>
-        <span style={{ background:color+"22", color, fontSize:10, padding:"2px 8px", borderRadius:4, fontWeight:900, fontFamily:"'IBM Plex Mono',monospace" }}>
-          {isUp?"▲ UP":"▼ DOWN"}
+        <span style={{ fontSize:9, color:dark?"#667788":"#556677", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>CANDLE #{candle.number}</span>
+        <span style={{ background:color+"33", color, fontSize:11, padding:"2px 8px", borderRadius:4, fontWeight:900, fontFamily:"'IBM Plex Mono',monospace" }}>
+          {up?"▲ UP":"▼ DOWN"}
         </span>
       </div>
-      <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:24, fontWeight:900, color, marginBottom:2 }}>
-        {candle.confidence}%
-      </div>
-      <div style={{ fontSize:9, color:dark?"#667788":"#556677", fontFamily:"'IBM Plex Mono',monospace", marginBottom:8 }}>
-        {candle.strength}
-      </div>
+      <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:26, fontWeight:900, color, marginBottom:2 }}>{candle.confidence}%</div>
+      <div style={{ fontSize:9, color:dark?"#667788":"#778899", marginBottom:6, fontFamily:"'IBM Plex Mono',monospace" }}>{candle.strength}</div>
       <div style={{ height:5, background:dark?"#0a1520":"#e0eaf4", borderRadius:3, overflow:"hidden", marginBottom:8 }}>
-        <div style={{ width:`${candle.confidence}%`, height:"100%", background:color, borderRadius:3, transition:"width 0.8s" }} />
+        <div style={{ width:`${candle.confidence}%`, height:"100%", background:color, borderRadius:3 }} />
       </div>
-      <div style={{ fontSize:9, color:dark?"#8899aa":"#445566", fontFamily:"'IBM Plex Mono',monospace", lineHeight:1.5 }}>
-        {candle.reason}
-      </div>
+      <div style={{ fontSize:9, color:dark?"#8899aa":"#445566", fontFamily:"'IBM Plex Mono',monospace", lineHeight:1.5 }}>{candle.reason}</div>
     </div>
   );
 }
 
-function SignalCard({ sig, dark, expanded, onToggle }) {
+function ResultCard({ result, dark, onClose }) {
   const sc = s => s==="BUY"?"#00dd55":s==="SELL"?"#ff2244":"#ffaa00";
   const sbg = s => s==="BUY"?(dark?"#001a0d":"#e8fff3"):s==="SELL"?(dark?"#1a0005":"#fff0f3"):(dark?"#1a1000":"#fffbe8");
-
-  const t = {
-    bgCard: dark?"rgba(0,20,40,0.9)":"#fff",
-    border: dark?"#0d2a42":"#d0dce8",
-    text: dark?"#c8d8e8":"#1a2a3a",
-    muted: dark?"#8899aa":"#445566",
-    dim: dark?"#445566":"#778899",
-    label: dark?"#667788":"#556677",
-  };
-
-  const timeAgo = ts => {
-    if (!ts) return "";
-    const d = Math.floor((Date.now()-new Date(ts))/1000);
-    if (d<60) return `${d}s ago`;
-    return `${Math.floor(d/60)}m ago`;
-  };
+  const [showInd, setShowInd] = useState(false);
+  const t = { muted:dark?"#8899aa":"#445566", dim:dark?"#445566":"#778899", label:dark?"#667788":"#556677", border:dark?"#0d2a42":"#d0dce8" };
+  const sig = result.signal;
 
   return (
-    <div style={{ background:sbg(sig.signal), border:`2px solid ${sc(sig.signal)}44`, borderLeft:`5px solid ${sc(sig.signal)}`, borderRadius:12, padding:"14px 16px", marginBottom:10 }}>
+    <div style={{ background:sbg(sig), border:`3px solid ${sc(sig)}55`, borderLeft:`6px solid ${sc(sig)}`, borderRadius:14, padding:"18px 16px", marginTop:14 }}>
+      <style>{`@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}.result-card{animation:slideIn 0.3s ease}`}</style>
 
-      {/* Header row */}
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10, cursor:"pointer" }} onClick={onToggle}>
-        <div>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
-            <span style={{ fontSize:18 }}>{sig.flag}</span>
-            <span style={{ fontFamily:"'Orbitron',sans-serif", fontSize:15, fontWeight:900, color:dark?"#fff":"#001133" }}>{sig.symbol}</span>
-            <span style={{ fontSize:9, color:t.dim, background:dark?"#0a1520":"#e0eaf4", padding:"2px 6px", borderRadius:3, fontFamily:"'IBM Plex Mono',monospace" }}>1MIN</span>
-          </div>
-          <div style={{ fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace" }}>
-            💰 {sig.price} · ⏱ {sig.expiry} · {timeAgo(sig.timestamp)}
+      {/* Close button */}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <span style={{ fontSize:20 }}>{result.flag}</span>
+          <div>
+            <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:dark?"#fff":"#001133" }}>{result.symbol}</div>
+            <div style={{ fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace" }}>1MIN · {result.expiry} expiry</div>
           </div>
         </div>
-        <div style={{ textAlign:"right" }}>
-          <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:22, fontWeight:900, color:sc(sig.signal) }}>
-            {sig.signal==="BUY"?"▲":sig.signal==="SELL"?"▼":"◆"} {sig.signal}
-          </div>
-          <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:15, fontWeight:700, color:sc(sig.signal) }}>
-            {sig.confidence}%
-          </div>
-        </div>
+        <button onClick={onClose} style={{ background:"transparent", border:"none", color:t.muted, cursor:"pointer", fontSize:20, lineHeight:1 }}>×</button>
       </div>
 
-      {/* Buyers/Sellers bar - always visible */}
-      <BuyerBar buyers={sig.buyers} sellers={sig.sellers} dark={dark} />
+      {/* Main signal */}
+      <div style={{ textAlign:"center", marginBottom:16, padding:"16px", background:dark?"rgba(0,0,0,0.2)":"rgba(255,255,255,0.5)", borderRadius:10 }}>
+        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:42, fontWeight:900, color:sc(sig), marginBottom:4 }}>
+          {sig==="BUY"?"▲":sig==="SELL"?"▼":"◆"} {sig}
+        </div>
+        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:22, fontWeight:700, color:sc(sig), marginBottom:6 }}>{result.confidence}% CONFIDENCE</div>
+        <div style={{ fontSize:10, color:t.muted, fontFamily:"'IBM Plex Mono',monospace" }}>💰 Entry: {result.entry} · {result.pattern}</div>
+      </div>
 
-      {/* Score bar */}
-      <div style={{ marginBottom:10 }}>
+      {/* Buyers/Sellers */}
+      <BuyerBar buyers={result.buyers} sellers={result.sellers} dark={dark} />
+
+      {/* Indicator score */}
+      <div style={{ marginBottom:12 }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-          <span style={{ fontSize:9, color:"#00dd55", fontFamily:"'IBM Plex Mono',monospace" }}>BULL {sig.bullScore}%</span>
-          <span style={{ fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace" }}>{sig.bullVotes}↑ {sig.bearVotes}↓ / {sig.totalVotes} indicators</span>
-          <span style={{ fontSize:9, color:"#ff2244", fontFamily:"'IBM Plex Mono',monospace" }}>BEAR {sig.bearScore}%</span>
+          <span style={{ fontSize:9, color:"#00dd55", fontFamily:"'IBM Plex Mono',monospace" }}>BULL {result.bullScore}%</span>
+          <span style={{ fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace" }}>{result.bullVotes}↑ {result.bearVotes}↓ / {result.totalVotes} indicators</span>
+          <span style={{ fontSize:9, color:"#ff2244", fontFamily:"'IBM Plex Mono',monospace" }}>BEAR {result.bearScore}%</span>
         </div>
-        <div style={{ height:6, background:dark?"#0a1520":"#e0eaf4", borderRadius:3, overflow:"hidden", display:"flex" }}>
-          <div style={{ width:`${sig.bullScore}%`, background:"linear-gradient(90deg,#00aa44,#00dd55)", transition:"width 0.5s" }} />
-          <div style={{ width:`${sig.bearScore}%`, background:"linear-gradient(90deg,#dd2244,#ff2244)", transition:"width 0.5s" }} />
+        <div style={{ height:7, background:dark?"#0a1520":"#e0eaf4", borderRadius:4, overflow:"hidden", display:"flex" }}>
+          <div style={{ width:`${result.bullScore}%`, background:"linear-gradient(90deg,#00aa44,#00dd55)", transition:"width 0.5s" }} />
+          <div style={{ width:`${result.bearScore}%`, background:"linear-gradient(90deg,#dd2244,#ff2244)", transition:"width 0.5s" }} />
         </div>
       </div>
 
-      {/* Pattern */}
-      <div style={{ fontSize:10, color:dark?"#4499cc":"#0055aa", fontFamily:"'IBM Plex Mono',monospace", marginBottom:8 }}>
-        📊 {sig.pattern} · {sig.trend}
-      </div>
-
-      {/* Next 3 candles preview - always visible */}
-      <div style={{ marginBottom:8 }}>
-        <div style={{ fontSize:9, letterSpacing:2, color:t.label, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700, marginBottom:8 }}>
-          NEXT 3 CANDLES PREDICTION
+      {/* 3 Candles */}
+      <div style={{ marginBottom:14 }}>
+        <div style={{ fontSize:10, letterSpacing:2, color:t.label, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700, marginBottom:10 }}>
+          📊 NEXT 3 CANDLES · 3 MIN EXPIRY
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
-          {(sig.next3candles||[]).map(c => (
-            <CandlePredict key={c.number} candle={c} dark={dark} />
-          ))}
+          {(result.next3candles||[]).map(c => <CandleCard key={c.number} candle={c} dark={dark} />)}
         </div>
       </div>
 
-      {/* Expand button */}
-      <button onClick={onToggle}
-        style={{ width:"100%", background:"transparent", border:`1px solid ${sc(sig.signal)}33`, borderRadius:6, padding:"6px", fontSize:9, color:t.muted, fontFamily:"'IBM Plex Mono',monospace", cursor:"pointer", fontWeight:700, letterSpacing:1 }}>
-        {expanded ? "▲ HIDE DETAILS" : "▼ SHOW INDICATORS"}
+      {/* TP/SL */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6, marginBottom:12 }}>
+        {[{l:"ENTRY",v:result.entry,c:"#4499ff"},{l:"TP1",v:result.tp1,c:"#00dd55"},{l:"TP2",v:result.tp2,c:"#00ee77"},{l:"SL",v:result.sl,c:"#ff2244"}].map(({l,v,c})=>(
+          <div key={l} style={{ background:dark?"rgba(0,0,0,0.25)":"rgba(0,0,0,0.05)", borderRadius:7, padding:"8px 5px", textAlign:"center" }}>
+            <div style={{ fontSize:8, color:t.label, fontFamily:"'IBM Plex Mono',monospace", marginBottom:3 }}>{l}</div>
+            <div style={{ fontSize:9, color:c, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Toggle indicators */}
+      <button onClick={()=>setShowInd(!showInd)}
+        style={{ width:"100%", background:"transparent", border:`1px solid ${sc(sig)}33`, borderRadius:6, padding:"7px", fontSize:9, color:t.muted, fontFamily:"'IBM Plex Mono',monospace", cursor:"pointer", fontWeight:700, letterSpacing:1, marginBottom:showInd?12:0 }}>
+        {showInd?"▲ HIDE INDICATORS":"▼ SHOW ALL INDICATORS"}
       </button>
 
-      {/* Expanded indicators */}
-      {expanded && (
-        <div style={{ marginTop:12, borderTop:`1px solid ${sc(sig.signal)}22`, paddingTop:12 }}>
-
-          {/* TP/SL */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6, marginBottom:12 }}>
-            {[
-              {l:"ENTRY", v:sig.entry, c:"#4499ff"},
-              {l:"TP1",   v:sig.tp1,   c:"#00dd55"},
-              {l:"TP2",   v:sig.tp2,   c:"#00ee77"},
-              {l:"SL",    v:sig.sl,    c:"#ff2244"},
-            ].map(({l,v,c})=>(
-              <div key={l} style={{ background:dark?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.05)", borderRadius:6, padding:"6px", textAlign:"center" }}>
-                <div style={{ fontSize:8, color:t.label, fontFamily:"'IBM Plex Mono',monospace" }}>{l}</div>
-                <div style={{ fontSize:9, color:c, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>{v}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Indicators breakdown */}
-          <div style={{ fontSize:9, letterSpacing:2, color:t.label, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700, marginBottom:8 }}>
-            INDICATOR BREAKDOWN
-          </div>
-          {sig.indicators && Object.entries({
-            "EMA Cross":  sig.indicators.emaCross,
-            "EMA 50":     sig.indicators.ema50,
-            "RSI 14":     sig.indicators.rsi,
-            "MACD":       sig.indicators.macd,
-            "VWAP":       sig.indicators.vwap,
-            "SMA 20":     sig.indicators.sma20,
-            "Supertrend": sig.indicators.supertrend,
-            "Pattern":    sig.indicators.pattern,
-            "Momentum":   sig.indicators.momentum,
-          }).filter(([,d])=>d).map(([label, detail])=>(
+      {showInd && result.indicators && (
+        <div>
+          <div style={{ fontSize:9, letterSpacing:2, color:t.label, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700, marginBottom:8 }}>INDICATOR BREAKDOWN</div>
+          {Object.entries({ "EMA Cross":result.indicators.emaCross, "EMA 50":result.indicators.ema50, "RSI 14":result.indicators.rsi, "MACD":result.indicators.macd, "VWAP":result.indicators.vwap, "SMA 20":result.indicators.sma20, "Supertrend":result.indicators.supertrend, "Pattern":result.indicators.pattern, "Momentum":result.indicators.momentum })
+            .filter(([,d])=>d).map(([label,detail])=>(
             <div key={label} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", borderBottom:`1px solid ${dark?"#0d2a4222":"#d0dce822"}` }}>
               <span style={{ fontSize:9, color:t.muted, fontFamily:"'IBM Plex Mono',monospace", width:80 }}>{label}</span>
               <span style={{ fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace", flex:1, textAlign:"center" }}>{detail.value}</span>
-              <span style={{ fontSize:9, fontWeight:700, fontFamily:"'IBM Plex Mono',monospace", color:detail.vote>0?"#00dd55":detail.vote<0?"#ff2244":"#ffaa00", width:60, textAlign:"right" }}>
-                {detail.label}
-              </span>
+              <span style={{ fontSize:9, fontWeight:700, fontFamily:"'IBM Plex Mono',monospace", color:detail.vote>0?"#00dd55":detail.vote<0?"#ff2244":"#ffaa00", width:55, textAlign:"right" }}>{detail.label}</span>
             </div>
           ))}
         </div>
@@ -196,16 +158,21 @@ function SignalCard({ sig, dark, expanded, onToggle }) {
 }
 
 export default function PocketOptionAuto({ dark }) {
-  const [signals, setSignals] = useState({});
+  const [mode, setMode] = useState("get"); // "get" | "auto"
+  const [selectedPair, setSelectedPair] = useState(ALL_PAIRS[0]);
+  const [result, setResult] = useState(null);
+  const [loadingGet, setLoadingGet] = useState(false);
+  const [getError, setGetError] = useState("");
+  // Auto mode
+  const [autoSignals, setAutoSignals] = useState({});
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [running, setRunning] = useState(true);
+  const [autoLoading, setAutoLoading] = useState(false);
+  const [autoError, setAutoError] = useState("");
   const [filter, setFilter] = useState("ALL");
+  const [running, setRunning] = useState(false);
   const [expanded, setExpanded] = useState(null);
-  const [selectedPairs, setSelectedPairs] = useState(PAIRS);
-  const [showPicker, setShowPicker] = useState(false);
+  const [serverOnline, setServerOnline] = useState(false);
   const intervalRef = useRef(null);
 
   const t = {
@@ -215,31 +182,87 @@ export default function PocketOptionAuto({ dark }) {
     muted: dark?"#8899aa":"#445566",
     dim: dark?"#445566":"#778899",
     label: dark?"#667788":"#556677",
+    inp: dark?"rgba(0,40,80,0.3)":"#e8f0f8",
   };
 
-  const fetchSignals = async () => {
+  // Check server on mount
+  useEffect(() => {
+    checkServer();
+  }, []);
+
+  const checkServer = async () => {
     try {
-      const res = await fetch(`${SERVER}/po/signals`);
-      const data = await res.json();
-      setSignals(data.signals || {});
+      const r = await fetch(`${SERVER}/health`, { signal: AbortSignal.timeout(15000) });
+      if (r.ok) setServerOnline(true);
+    } catch(e) { setServerOnline(false); }
+  };
+
+  // GET SIGNAL — instant single pair
+  const getSignal = async () => {
+    setLoadingGet(true);
+    setGetError("");
+    setResult(null);
+    try {
+      const sym = encodeURIComponent(selectedPair.symbol);
+      const res = await fetch(`${SERVER}/po/get/${sym}`, {
+        signal: AbortSignal.timeout(45000)
+      });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch(e) { setGetError("Server returned invalid response. It may be starting up — wait 30s and retry."); setLoadingGet(false); return; }
+      if (data.error) { setGetError(data.error); setLoadingGet(false); return; }
+      // Add flag from pair list
+      const pairInfo = ALL_PAIRS.find(p => p.symbol === selectedPair.symbol);
+      setResult({ ...data, flag: pairInfo?.flag || "📊" });
+    } catch(e) {
+      if (e.name === "AbortError") setGetError("Request timed out — server may be waking up. Wait 30 seconds and try again.");
+      else setGetError(`Connection error: ${e.message}`);
+    }
+    setLoadingGet(false);
+  };
+
+  // AUTO — fetch all signals
+  const fetchAutoSignals = async () => {
+    try {
+      const res = await fetch(`${SERVER}/po/signals`, { signal: AbortSignal.timeout(15000) });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch(e) { setAutoError("Server offline — retrying..."); return; }
+      setAutoSignals(data.signals || {});
       setLastUpdated(data.lastUpdated);
       setIsAnalyzing(data.isAnalyzing);
-      setError(null);
-    } catch(e) { setError("Server offline — retrying..."); }
-    setLoading(false);
+      setAutoError("");
+      setServerOnline(true);
+    } catch(e) { setAutoError("Server offline — retrying..."); }
+    setAutoLoading(false);
+  };
+
+  const triggerAuto = () => {
+    fetch(`${SERVER}/po/trigger`, { signal: AbortSignal.timeout(10000) }).catch(()=>{});
+    setIsAnalyzing(true);
+    setTimeout(fetchAutoSignals, 8000);
   };
 
   useEffect(() => {
-    fetchSignals();
-    intervalRef.current = setInterval(() => { if (running) fetchSignals(); }, 30000);
+    if (mode === "auto") {
+      setAutoLoading(true);
+      fetchAutoSignals();
+      if (running) {
+        intervalRef.current = setInterval(fetchAutoSignals, 60000);
+      }
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [mode, running]);
+
+  useEffect(() => {
+    clearInterval(intervalRef.current);
+    if (mode === "auto" && running) {
+      intervalRef.current = setInterval(fetchAutoSignals, 60000);
+    }
     return () => clearInterval(intervalRef.current);
   }, [running]);
-
-  const triggerNow = () => {
-    fetch(`${SERVER}/po/trigger`).catch(()=>{});
-    setTimeout(fetchSignals, 5000);
-    setIsAnalyzing(true);
-  };
 
   const timeAgo = ts => {
     if (!ts) return "Never";
@@ -249,154 +272,217 @@ export default function PocketOptionAuto({ dark }) {
     return `${Math.floor(d/3600)}h ago`;
   };
 
-  const allSignals = Object.values(signals).filter(s => selectedPairs.includes(s.symbol));
-  const filtered = filter==="ALL" ? allSignals
-    : filter==="BUY"  ? allSignals.filter(s=>s.signal==="BUY")
-    : filter==="SELL" ? allSignals.filter(s=>s.signal==="SELL")
-    : filter==="FOREX"? allSignals.filter(s=>s.type==="forex")
-    : allSignals.filter(s=>s.type==="crypto"||s.type==="commodity");
+  const sc = s => s==="BUY"?"#00dd55":s==="SELL"?"#ff2244":"#ffaa00";
+  const sbg = s => s==="BUY"?(dark?"#001a0d":"#e8fff3"):s==="SELL"?(dark?"#1a0005":"#fff0f3"):(dark?"#1a1000":"#fffbe8");
 
-  const buys  = allSignals.filter(s=>s.signal==="BUY").length;
-  const sells = allSignals.filter(s=>s.signal==="SELL").length;
+  const allAuto = Object.values(autoSignals);
+  const filtered = filter==="ALL"?allAuto:filter==="BUY"?allAuto.filter(s=>s.signal==="BUY"):filter==="SELL"?allAuto.filter(s=>s.signal==="SELL"):allAuto;
 
   return (
-    <div style={{ flex:1, background:t.bg, overflowY:"auto" }}>
+    <div style={{ background:t.bg, minHeight:"100%", fontFamily:"'IBM Plex Mono',monospace" }}>
       <style>{`
         @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
         .pospin{animation:spin 1s linear infinite;display:inline-block}
         .populse{animation:pulse 1.5s infinite}
         .pobtn{cursor:pointer;transition:all 0.15s;border:none;font-family:'IBM Plex Mono',monospace;font-weight:700}
-        .pobtn:hover{opacity:0.8}
-        .pochip{cursor:pointer;transition:all 0.15s;user-select:none}
-        .pochip:hover{transform:scale(1.04)}
+        .pobtn:hover{opacity:0.85}
+        .pair-chip{cursor:pointer;transition:all 0.15s;user-select:none}
+        .pair-chip:hover{transform:scale(1.04)}
+        .slide-down{animation:slideDown 0.3s ease}
       `}</style>
 
       <div style={{ maxWidth:900, margin:"0 auto", padding:"14px 16px" }}>
 
         {/* Header */}
         <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, padding:"14px 16px", marginBottom:14 }}>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
             <div>
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
-                <div style={{ position:"relative", width:10, height:10 }}>
-                  <div style={{ position:"absolute", inset:0, borderRadius:"50%", background:running?"#00dd55":"#ff2244" }} />
-                  {running && <div className="populse" style={{ position:"absolute", inset:-3, borderRadius:"50%", border:"2px solid #00dd5544" }} />}
+              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:13, fontWeight:900, color:dark?"#fff":"#001133", letterSpacing:2, marginBottom:3 }}>
+                🟢 POCKET OPTION AUTO
+              </div>
+              <div style={{ fontSize:9, color:t.dim }}>
+                1MIN · 3 CANDLES EXPIRY · 27 FOREX PAIRS + GOLD + CRYPTO
+              </div>
+            </div>
+            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:serverOnline?"#00dd55":"#ff4466" }} />
+              <span style={{ fontSize:9, color:serverOnline?"#00dd55":"#ff4466" }}>{serverOnline?"ONLINE":"OFFLINE"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mode switcher */}
+        <div style={{ display:"flex", gap:6, marginBottom:16, background:t.bgCard, borderRadius:10, padding:5, border:`1px solid ${t.border}` }}>
+          <button className="pobtn" onClick={()=>setMode("get")}
+            style={{ flex:1, padding:"11px", background:mode==="get"?"linear-gradient(135deg,#00aa44,#007733)":"transparent", border:"none", color:mode==="get"?"#fff":t.muted, borderRadius:7, fontSize:11, letterSpacing:1 }}>
+            ⚡ GET SIGNAL
+          </button>
+          <button className="pobtn" onClick={()=>setMode("auto")}
+            style={{ flex:1, padding:"11px", background:mode==="auto"?"#0066ff":"transparent", border:"none", color:mode==="auto"?"#fff":t.muted, borderRadius:7, fontSize:11, letterSpacing:1 }}>
+            📡 AUTO SCAN
+          </button>
+        </div>
+
+        {/* ===== GET SIGNAL MODE ===== */}
+        {mode==="get" && (
+          <div className="slide-down">
+            {/* Pair selector */}
+            <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, padding:"14px 16px", marginBottom:14 }}>
+              <div style={{ fontSize:9, letterSpacing:2, color:t.label, fontWeight:700, marginBottom:12 }}>SELECT PAIR</div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                {ALL_PAIRS.map(p => (
+                  <div key={p.symbol} className="pair-chip" onClick={()=>{ setSelectedPair(p); setResult(null); setGetError(""); }}
+                    style={{ padding:"6px 10px", background:selectedPair.symbol===p.symbol?(dark?"#00aa4422":"#e8fff3"):"transparent", border:`2px solid ${selectedPair.symbol===p.symbol?"#00aa44":t.border}`, color:selectedPair.symbol===p.symbol?"#00aa44":t.muted, borderRadius:7, fontSize:9, fontWeight:700, display:"flex", alignItems:"center", gap:4 }}>
+                    <span>{p.flag}</span> {p.symbol}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Selected pair + Get Signal button */}
+            <div style={{ background:t.bgCard, border:`2px solid #00aa4444`, borderRadius:12, padding:"16px", marginBottom:14 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <span style={{ fontSize:28 }}>{selectedPair.flag}</span>
+                  <div>
+                    <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:dark?"#fff":"#001133" }}>{selectedPair.symbol}</div>
+                    <div style={{ fontSize:9, color:t.dim }}>1 minute · 3 candles · 3 min expiry</div>
+                  </div>
                 </div>
-                <span style={{ fontFamily:"'Orbitron',sans-serif", fontSize:12, fontWeight:900, color:running?(dark?"#00dd55":"#009944"):"#ff2244", letterSpacing:2 }}>
-                  POCKET OPTION AUTO
-                </span>
               </div>
-              <div style={{ fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace" }}>
-                1MIN · 3 CANDLES EXPIRY · {allSignals.length} PAIRS SCANNED · Updated {timeAgo(lastUpdated)}
-              </div>
-            </div>
-            <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-              <button className="pobtn" onClick={triggerNow}
-                style={{ background:"#0066ff22", border:"1px solid #0066ff44", color:"#4499ff", padding:"6px 12px", borderRadius:6, fontSize:9, letterSpacing:1 }}>
-                ⟳ SCAN NOW
+
+              {getError && (
+                <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:7, padding:"10px 14px", marginBottom:12, fontSize:11, color:"#ff5577" }}>
+                  ⚠ {getError}
+                  <button onClick={()=>setGetError("")} style={{ float:"right", background:"none", border:"none", color:"#ff5577", cursor:"pointer", fontSize:16 }}>×</button>
+                </div>
+              )}
+
+              <button className="pobtn" onClick={getSignal} disabled={loadingGet}
+                style={{ width:"100%", padding:"16px", background:loadingGet?(dark?"#0a1520":"#e0eaf4"):"linear-gradient(135deg,#00aa44,#007733)", border:"none", color:loadingGet?t.muted:"#fff", borderRadius:10, fontSize:14, letterSpacing:2, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+                {loadingGet ? <><span className="pospin">⟳</span> ANALYZING {selectedPair.symbol}...</> : `⚡ GET SIGNAL — ${selectedPair.symbol}`}
               </button>
-              {running
-                ? <button className="pobtn" onClick={()=>setRunning(false)} style={{ background:"#ff224422", border:"1px solid #ff224433", color:"#ff4466", padding:"6px 12px", borderRadius:6, fontSize:9 }}>⏹ STOP</button>
-                : <button className="pobtn" onClick={()=>{setRunning(true);fetchSignals();}} style={{ background:"#00dd5522", border:"1px solid #00dd5533", color:"#00dd55", padding:"6px 12px", borderRadius:6, fontSize:9 }}>▶ START</button>
-              }
-            </div>
-          </div>
-        </div>
 
-        {/* Stats */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:10, marginBottom:14 }}>
-          {[
-            {l:"PAIRS",   v:allSignals.length,         c:dark?"#c8d8e8":"#1a2a3a"},
-            {l:"BUY",     v:buys,                       c:"#00dd55"},
-            {l:"SELL",    v:sells,                      c:"#ff2244"},
-            {l:"WAIT",    v:allSignals.length-buys-sells, c:"#ffaa00"},
-          ].map(({l,v,c})=>(
-            <div key={l} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"10px", textAlign:"center" }}>
-              <div style={{ fontSize:8, letterSpacing:2, color:t.label, fontFamily:"'IBM Plex Mono',monospace", marginBottom:3 }}>{l}</div>
-              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:20, fontWeight:900, color:c }}>{v}</div>
+              {loadingGet && (
+                <div style={{ marginTop:10, fontSize:10, color:t.dim, textAlign:"center" }}>
+                  Fetching candles → Running 9 indicators → Predicting 3 candles...
+                </div>
+              )}
             </div>
-          ))}
-        </div>
 
-        {/* Pair picker */}
-        <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:showPicker?10:0 }}>
-            <span style={{ fontSize:9, letterSpacing:2, color:t.label, fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>WATCHING {selectedPairs.length} PAIRS</span>
-            <button className="pobtn" onClick={()=>setShowPicker(!showPicker)}
-              style={{ background:"transparent", border:`1px solid ${t.border}`, color:t.muted, padding:"3px 10px", borderRadius:4, fontSize:9 }}>
-              {showPicker?"DONE":"EDIT"}
-            </button>
+            {/* Result */}
+            {result && <ResultCard result={result} dark={dark} onClose={()=>setResult(null)} />}
           </div>
-          {showPicker && (
-            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-              {PAIRS.map(p=>(
-                <div key={p} className="pochip" onClick={()=>setSelectedPairs(prev=>prev.includes(p)?prev.filter(x=>x!==p):[...prev,p])}
-                  style={{ padding:"4px 10px", background:selectedPairs.includes(p)?"#0066ff22":"transparent", border:`1px solid ${selectedPairs.includes(p)?"#0066ff":t.border}`, color:selectedPairs.includes(p)?"#4499ff":t.muted, borderRadius:5, fontFamily:"'IBM Plex Mono',monospace", fontSize:9, fontWeight:700 }}>
-                  {p}
+        )}
+
+        {/* ===== AUTO SCAN MODE ===== */}
+        {mode==="auto" && (
+          <div className="slide-down">
+            {/* Controls */}
+            <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:"12px 14px", marginBottom:12 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+                <div style={{ fontSize:9, color:t.dim }}>
+                  Auto-scans all 29 pairs every 60s · Last: {timeAgo(lastUpdated)}
+                </div>
+                <div style={{ display:"flex", gap:6 }}>
+                  <button className="pobtn" onClick={triggerAuto}
+                    style={{ background:"#0066ff22", border:"1px solid #0066ff44", color:"#4499ff", padding:"6px 12px", borderRadius:6, fontSize:9 }}>
+                    ⟳ SCAN NOW
+                  </button>
+                  {running
+                    ? <button className="pobtn" onClick={()=>setRunning(false)} style={{ background:"#ff224422", border:"1px solid #ff224433", color:"#ff4466", padding:"6px 12px", borderRadius:6, fontSize:9 }}>⏹ STOP</button>
+                    : <button className="pobtn" onClick={()=>setRunning(true)} style={{ background:"#00dd5522", border:"1px solid #00dd5533", color:"#00dd55", padding:"6px 12px", borderRadius:6, fontSize:9 }}>▶ START AUTO</button>
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:12 }}>
+              {[{l:"BUY",v:allAuto.filter(s=>s.signal==="BUY").length,c:"#00dd55"},
+                {l:"SELL",v:allAuto.filter(s=>s.signal==="SELL").length,c:"#ff2244"},
+                {l:"TOTAL",v:allAuto.length,c:dark?"#c8d8e8":"#1a2a3a"}].map(({l,v,c})=>(
+                <div key={l} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"10px", textAlign:"center" }}>
+                  <div style={{ fontSize:8, letterSpacing:2, color:t.label, marginBottom:3 }}>{l}</div>
+                  <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:20, fontWeight:900, color:c }}>{v}</div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
 
-        {/* Filter */}
-        <div style={{ display:"flex", gap:5, marginBottom:14, flexWrap:"wrap" }}>
-          {["ALL","BUY","SELL","FOREX","CRYPTO"].map(f=>(
-            <button key={f} className="pobtn" onClick={()=>setFilter(f)}
-              style={{ padding:"5px 12px", background:filter===f?"#ffd700":"transparent", border:`1px solid ${filter===f?"#ffd700":t.border}`, color:filter===f?"#000":t.muted, borderRadius:5, fontSize:9, letterSpacing:1 }}>
-              {f}
-            </button>
-          ))}
-        </div>
-
-        {/* Status messages */}
-        {isAnalyzing && (
-          <div style={{ background:dark?"#001833":"#e8f4ff", border:"1px solid #0066ff33", borderRadius:8, padding:"8px 14px", marginBottom:12, display:"flex", gap:8, alignItems:"center" }}>
-            <span className="pospin" style={{ color:"#4499ff" }}>⟳</span>
-            <span style={{ fontSize:10, color:"#4499ff", fontFamily:"'IBM Plex Mono',monospace" }}>Scanning all pairs...</span>
-          </div>
-        )}
-        {error && (
-          <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:8, padding:"8px 14px", marginBottom:12, fontSize:10, color:"#ff4466", fontFamily:"'IBM Plex Mono',monospace" }}>⚠ {error}</div>
-        )}
-        {loading && (
-          <div style={{ textAlign:"center", padding:32 }}>
-            <div className="pospin" style={{ fontSize:24, color:"#0066ff" }}>⟳</div>
-            <div style={{ marginTop:8, fontSize:11, color:t.dim, fontFamily:"'IBM Plex Mono',monospace" }}>Loading Pocket Option signals...</div>
-          </div>
-        )}
-
-        {/* No signals */}
-        {!loading && filtered.length===0 && (
-          <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:28, textAlign:"center" }}>
-            <div style={{ fontSize:32, marginBottom:10 }}>📊</div>
-            <div style={{ fontSize:12, color:t.muted, fontFamily:"'IBM Plex Mono',monospace", marginBottom:14 }}>
-              {allSignals.length===0 ? "No signals yet — tap SCAN NOW" : `No ${filter} signals right now`}
+            {/* Filter */}
+            <div style={{ display:"flex", gap:5, marginBottom:12 }}>
+              {["ALL","BUY","SELL"].map(f=>(
+                <button key={f} className="pobtn" onClick={()=>setFilter(f)}
+                  style={{ padding:"5px 14px", background:filter===f?"#ffd700":"transparent", border:`1px solid ${filter===f?"#ffd700":t.border}`, color:filter===f?"#000":t.muted, borderRadius:5, fontSize:9, letterSpacing:1 }}>
+                  {f}
+                </button>
+              ))}
             </div>
-            <button className="pobtn" onClick={triggerNow}
-              style={{ padding:"10px 24px", background:"linear-gradient(135deg,#0066ff,#0044bb)", color:"#fff", borderRadius:8, fontSize:11, letterSpacing:1 }}>
-              ⚡ SCAN ALL PAIRS
-            </button>
-          </div>
-        )}
 
-        {/* Signal cards */}
-        {filtered.map((sig,i)=>(
-          <SignalCard
-            key={sig.symbol}
-            sig={sig}
-            dark={dark}
-            expanded={expanded===i}
-            onToggle={()=>setExpanded(expanded===i?null:i)}
-          />
-        ))}
+            {autoError && (
+              <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:8, padding:"8px 14px", marginBottom:12, fontSize:10, color:"#ff5577" }}>
+                ⚠ {autoError} <button className="pobtn" onClick={()=>{fetchAutoSignals();checkServer();}} style={{ background:"none", color:"#4499ff", fontSize:9, marginLeft:8 }}>Retry</button>
+              </div>
+            )}
 
-        {/* Footer */}
-        {allSignals.length>0 && (
-          <div style={{ marginTop:10, marginBottom:20, padding:"10px 14px", background:dark?"#001833":"#e8f4ff", border:"1px solid #0066ff22", borderRadius:8, fontSize:9, color:t.dim, fontFamily:"'IBM Plex Mono',monospace", textAlign:"center", lineHeight:1.8 }}>
-            Auto-refreshes every 60 seconds · 1min timeframe · 3 candle expiry = 3 minutes<br/>
-            Buyers/Sellers based on RSI, MACD, EMA, momentum · Not financial advice
+            {isAnalyzing && (
+              <div style={{ background:dark?"#001833":"#e8f4ff", border:"1px solid #0066ff33", borderRadius:8, padding:"8px 14px", marginBottom:12, display:"flex", gap:8, alignItems:"center" }}>
+                <span className="pospin" style={{ color:"#4499ff" }}>⟳</span>
+                <span style={{ fontSize:10, color:"#4499ff" }}>Scanning all 29 pairs...</span>
+              </div>
+            )}
+
+            {autoLoading && allAuto.length===0 && (
+              <div style={{ textAlign:"center", padding:32 }}>
+                <div className="pospin" style={{ fontSize:24, color:"#00aa44" }}>⟳</div>
+                <div style={{ marginTop:8, fontSize:11, color:t.dim }}>Loading signals...</div>
+              </div>
+            )}
+
+            {!autoLoading && allAuto.length===0 && (
+              <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:24, textAlign:"center" }}>
+                <div style={{ fontSize:28, marginBottom:10 }}>📊</div>
+                <div style={{ fontSize:11, color:t.muted, marginBottom:14 }}>No signals yet — tap SCAN NOW to start</div>
+                <button className="pobtn" onClick={triggerAuto}
+                  style={{ padding:"10px 24px", background:"linear-gradient(135deg,#00aa44,#007733)", color:"#fff", borderRadius:8, fontSize:11, letterSpacing:1 }}>
+                  ⚡ SCAN ALL PAIRS NOW
+                </button>
+              </div>
+            )}
+
+            {/* Auto signal cards - compact */}
+            {filtered.map((sig,i)=>{
+              const flag = ALL_PAIRS.find(p=>p.symbol===sig.symbol)?.flag||"📊";
+              return (
+                <div key={sig.symbol} style={{ background:sbg(sig.signal), border:`2px solid ${sc(sig.signal)}44`, borderLeft:`5px solid ${sc(sig.signal)}`, borderRadius:12, padding:"12px 14px", marginBottom:10, cursor:"pointer" }}
+                  onClick={()=>setExpanded(expanded===i?null:i)}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                      <span style={{ fontSize:16 }}>{flag}</span>
+                      <span style={{ fontFamily:"'Orbitron',sans-serif", fontSize:13, fontWeight:900, color:dark?"#fff":"#001133" }}>{sig.symbol}</span>
+                      <span style={{ fontSize:8, color:t.dim, background:dark?"#0a1520":"#e0eaf4", padding:"1px 5px", borderRadius:3 }}>1MIN</span>
+                    </div>
+                    <div style={{ textAlign:"right" }}>
+                      <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, fontWeight:900, color:sc(sig.signal) }}>
+                        {sig.signal==="BUY"?"▲":sig.signal==="SELL"?"▼":"◆"} {sig.signal}
+                      </div>
+                      <div style={{ fontSize:12, color:sc(sig.signal), fontWeight:700 }}>{sig.confidence}%</div>
+                    </div>
+                  </div>
+                  <BuyerBar buyers={sig.buyers||50} sellers={sig.sellers||50} dark={dark} />
+                  {expanded===i && (
+                    <div style={{ marginTop:10 }}>
+                      <div style={{ fontSize:9, letterSpacing:2, color:t.label, fontWeight:700, marginBottom:8 }}>NEXT 3 CANDLES</div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8 }}>
+                        {(sig.next3candles||[]).map(c=><CandleCard key={c.number} candle={c} dark={dark} />)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
