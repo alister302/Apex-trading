@@ -15,7 +15,7 @@ import { supabase } from "./supabase";
 const SERVER = "https://apex-server-09p7.onrender.com";
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
-const PROMPT = `You are PRINCEX ACADEMY — elite candlestick analyst. Analyze chart screenshot. ALWAYS give prediction. Return ONLY JSON:
+const PROMPT = `You are PRINCEX IQ — elite candlestick analyst. Analyze chart screenshot. ALWAYS give prediction. Return ONLY JSON:
 {"pair":"UNKNOWN","timeframe":"","market_bias":"BULLISH or BEARISH or NEUTRAL","trend":"","patterns":[],"support":"","resistance":"","entry_signal":"BUY or SELL or WAIT","trade_duration":"","candles":[{"number":1,"direction":"UP or DOWN","strength":"STRONG or MEDIUM or WEAK","confidence":85,"reason":""},{"number":2,"direction":"UP or DOWN","strength":"STRONG or MEDIUM or WEAK","confidence":80,"reason":""},{"number":3,"direction":"UP or DOWN","strength":"STRONG or MEDIUM or WEAK","confidence":75,"reason":""}],"summary":""}`;
 
 const PREMIUM_TABS = ["elite","longterm","fast"];
@@ -355,7 +355,7 @@ export default function App() {
 
                 <div style={{display:"flex",gap:8}}>
                   <button className="sb" onClick={analyze} disabled={!b64||loading} style={{flex:1}}>
-                    {loading ? "⟳  SCANNING..." : "⚡  RUN PRINCEX ACADEMY ANALYSIS"}
+                    {loading ? "⟳  SCANNING..." : "⚡  RUN PRINCEX IQ ANALYSIS"}
                   </button>
                   {image && (
                     <button onClick={()=>{setImage(null);setB64(null);setResult(null);setErr(null);}}
@@ -369,7 +369,7 @@ export default function App() {
 
                 {loading && (
                   <div style={{background:t.bgCard,border:`1px solid ${t.border}`,padding:20,textAlign:"center",borderRadius:8}}>
-                    <div className="pulse" style={{fontSize:12,fontWeight:700,letterSpacing:2,color:"#0088ff"}}>⚡ PRINCEX ACADEMY SCANNING CHART...</div>
+                    <div className="pulse" style={{fontSize:12,fontWeight:700,letterSpacing:2,color:"#0088ff"}}>⚡ PRINCEX IQ SCANNING CHART...</div>
                     <div style={{marginTop:8,fontSize:10,color:t.muted}}>Detecting patterns · Computing signals</div>
                   </div>
                 )}
@@ -440,7 +440,7 @@ export default function App() {
                     </div>
 
                     <div style={{background:t.bgCard,border:`1px solid ${t.border}`,borderLeft:`4px solid ${bc(result.market_bias)}`,borderRadius:8,padding:"12px 14px"}}>
-                      <div style={{fontSize:8,letterSpacing:2,color:t.label,marginBottom:6,fontWeight:700}}>PRINCEX ACADEMY SUMMARY</div>
+                      <div style={{fontSize:8,letterSpacing:2,color:t.label,marginBottom:6,fontWeight:700}}>PRINCEX IQ SUMMARY</div>
                       <div style={{fontSize:11,color:t.muted,lineHeight:1.8}}>{result.summary}</div>
                     </div>
                   </div>
@@ -475,7 +475,7 @@ export default function App() {
 
       {/* FOOTER */}
       <div style={{flexShrink:0,borderTop:`1px solid ${t.border}`,padding:"5px 14px",display:"flex",justifyContent:"space-between",background:t.bgH}}>
-        <div style={{fontSize:8,color:t.dim}}>PRINCEX ACADEMY · PRINCE X TOOLS</div>
+        <div style={{fontSize:8,color:t.dim}}>PRINCEX IQ · PRINCE X TOOLS</div>
         <div style={{fontSize:8,color:t.dim}}>TRADING INVOLVES RISK</div>
       </div>
     </div>

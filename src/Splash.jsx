@@ -61,7 +61,7 @@ export default function Splash({ onDone }) {
   // Phase timeline
   useEffect(() => {
     const statuses = [
-      [0,    "INITIALIZING PRINCEX ACADEMY..."],
+      [0,    "INITIALIZING PRINCEX IQ..."],
       [600,  "LOADING MARKET DATA..."],
       [1200, "CONNECTING TO SIGNALS..."],
       [1800, "SCANNING INDICATORS..."],

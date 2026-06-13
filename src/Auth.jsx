@@ -119,7 +119,7 @@ export default function Auth({ onLogin }) {
           {mode==="forgot" && <button className="link" onClick={()=>{setMode("login");reset();}} style={{ fontSize:11, color:"#4499ff", fontWeight:700 }}>← Back to sign in</button>}
         </div>
 
-        <div style={{ marginTop:24, fontSize:8, color:"#1a2a3a", textAlign:"center", letterSpacing:1 }}>PRINCEX ACADEMY · PRINCE X TOOLS · TRADING INVOLVES RISK</div>
+        <div style={{ marginTop:24, fontSize:8, color:"#1a2a3a", textAlign:"center", letterSpacing:1 }}>PRINCEX IQ · PRINCE X TOOLS · TRADING INVOLVES RISK</div>
       </div>
     </div>
   );

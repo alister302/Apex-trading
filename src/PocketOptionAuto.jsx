@@ -249,7 +249,7 @@ export default function PocketOptionAuto({ dark }) {
         <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, padding:"12px 16px", marginBottom:12 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div>
-              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:13, fontWeight:900, color:dark?"#fff":"#001133", letterSpacing:2, marginBottom:2 }}>🟢 POCKET OPTION AUTO</div>
+              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:13, fontWeight:900, color:dark?"#fff":"#001133", letterSpacing:2, marginBottom:2 }}>🟢 PRINCEX IQ SIGNALS</div>
               <div style={{ fontSize:9, color:t.dim }}>1MIN CANDLES · 3 CANDLES EXPIRY · 30 PAIRS</div>
             </div>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
