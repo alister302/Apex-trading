@@ -35,7 +35,7 @@ export default function Auth({ onLogin }) {
   const handleForgot = async () => {
     if (!email.trim()) { setError("Enter your email address"); return; }
     setLoading(true); reset();
-    const { error: e } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: "https://apex-trading-eta.vercel.app" });
+    const { error: e } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: "https://princex-iq-eta.vercel.app" });
     setLoading(false);
     if (e) setError(e.message);
     else setSuccess("Reset link sent! Check your email inbox.");

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-server-09p7.onrender.com";
 
 export default function AdminDashboard({ dark, onExit }) {
   const [tab, setTab] = useState("stats");

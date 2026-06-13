@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import PocketOptionAuto from "./PocketOptionAuto";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-server-09p7.onrender.com";
 
 const ALL_PAIRS = [
   { symbol:"EUR/USD", type:"forex", tv:"EURUSD" },

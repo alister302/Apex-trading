@@ -134,7 +134,7 @@ export default function RiskCalc({ dark }) {
                 style={{ ...inputStyle, width: 100, padding: "7px 10px", fontSize: 11 }} />
             </div>
             <div style={{ fontSize: 10, color: t.textDim, fontFamily: "'IBM Plex Mono', monospace" }}>
-              💡 APEX recommends minimum 3:1. Lower ratios need higher win rate.
+              💡 PRINCEX IQ recommends minimum 3:1. Lower ratios need higher win rate.
             </div>
           </div>
 
@@ -246,7 +246,7 @@ export default function RiskCalc({ dark }) {
                 `Max trades today: ${tradesNum}`,
                 `Min win rate needed to profit: ${breakEvenWinRate.toFixed(1)}%`,
                 `Never revenge trade after a loss`,
-                `Always wait for APEX signal before entering`,
+                `Always wait for PRINCEX IQ signal before entering`,
               ].map((rule, i) => (
                 <div key={i} style={{ fontSize: 11, color: dark ? "#4499cc" : "#0055aa", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 2 }}>✓ {rule}</div>
               ))}

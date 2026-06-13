@@ -41,7 +41,7 @@ Types of Doji:
 • Gravestone Doji — long upper wick, no lower wick (bearish)
 
 WHEN YOU SEE IT: Wait for the next candle to confirm direction before entering.`,
-        tip: "A Doji after a long trend is a POWERFUL reversal warning. Screenshot it and run APEX immediately!",
+        tip: "A Doji after a long trend is a POWERFUL reversal warning. Screenshot it and run PRINCEX IQ immediately!",
         candle: "doji"
       },
       {
@@ -315,7 +315,7 @@ TREND EXHAUSTION (Reversal Warning):
 • A Doji or reversal candle appears
 • Price fails to make new high/low
 
-When you see exhaustion — get ready for a reversal! This is when APEX shines.`,
+When you see exhaustion — get ready for a reversal! This is when PRINCEX IQ shines.`,
         tip: "The best time to enter a trend is after a small pullback (retracement). Don't chase price — wait for it to come to you!",
         candle: null
       },
@@ -485,7 +485,7 @@ IMPROVING WIN RATE:
 ✓ Trade with the trend, not against it
 ✓ Use strong S&R levels
 ✓ Wait for candle patterns to confirm
-✓ Use APEX to validate your analysis
+✓ Use PRINCEX IQ to validate your analysis
 
 REALISTIC EXPECTATIONS:
 • 55-60% win rate = small consistent profit
@@ -620,7 +620,7 @@ STEP 5 — Enter in trend direction
 • Downtrend + bearish candle at resistance = SELL
 • Trade duration: 3-5 candles
 
-BONUS: Run APEX on the screenshot before entering to validate your analysis. Two-brain confirmation!`,
+BONUS: Run PRINCEX IQ on the screenshot before entering to validate your analysis. Two-brain confirmation!`,
         tip: "If you can't find a clear setup in 30 minutes, don't trade. The market will always be there tomorrow. Your capital might not be.",
         candle: null
       },
