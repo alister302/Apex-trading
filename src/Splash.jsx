@@ -188,7 +188,7 @@ export default function Splash({ onDone }) {
             letterSpacing:6,
             textShadow:"0 0 20px #0066ff88, 0 0 40px #0066ff44",
           }}>
-            PRINCEX <span style={{ color:"#ffd700" }}>ACADEMY</span>
+            PRINCEX <span style={{ color:"#ffd700" }}>IQ</span>
           </div>
           <div style={{
             fontFamily:"'IBM Plex Mono',monospace",

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import Academy from "./Academy";
+import IQ from "./IQ";
 import Quiz from "./Quiz";
 import Fast from "./Fast";
 import LongTerm from "./LongTerm";
@@ -165,7 +165,7 @@ export default function App() {
 
   const TABS = [
     {id:"analyzer",label:"⚡ ANALYZER",premium:false},
-    {id:"academy",label:"🎓 ACADEMY",premium:false},
+    {id:"iq",label:"🎓 IQ",premium:false},
     {id:"quiz",label:"🧩 QUIZ",premium:false},
     {id:"fast",label:"⚡ FAST",premium:true},
     {id:"longterm",label:"📈 LONG TERM",premium:true},
@@ -235,7 +235,7 @@ export default function App() {
             </div>
             <div>
               <div style={{fontFamily:"'Orbitron',sans-serif",fontSize:14,fontWeight:900,color:dark?"#fff":"#0044bb",letterSpacing:3}}>
-                PRINCEX <span style={{color:"#ffd700"}}>ACADEMY</span>
+                PRINCEX <span style={{color:"#ffd700"}}>IQ</span>
               </div>
               <div style={{fontSize:7,letterSpacing:2,color:t.dim}}>TRADING SIGNALS</div>
             </div>
@@ -318,7 +318,7 @@ export default function App() {
         )}
 
         {!showSub && <>
-          {tab==="academy" && <Academy dark={dark} />}
+          {tab==="iq" && <IQ dark={dark} />}
           {tab==="quiz" && <Quiz dark={dark} />}
           {tab==="fast" && <Fast dark={dark} />}
           {tab==="longterm" && <LongTerm dark={dark} />}

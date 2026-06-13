@@ -788,7 +788,7 @@ function CandleSVG({ type, dark }) {
   );
 }
 
-export default function Academy({ dark }) {
+export default function IQ({ dark }) {
   const [activeChapter, setActiveChapter] = useState(0);
   const [activeLesson, setActiveLesson] = useState(0);
 

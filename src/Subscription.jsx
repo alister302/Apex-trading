@@ -161,7 +161,7 @@ export default function Subscription({ user, sub, onSubscribed, dark }) {
         {/* Header */}
         <div style={{ textAlign:"center", marginBottom:22 }}>
           <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:20, fontWeight:900, color:dark?"#fff":"#001133", letterSpacing:3, marginBottom:5 }}>
-            PRINCEX <span style={{ color:"#ffd700" }}>ACADEMY</span> PREMIUM
+            PRINCEX <span style={{ color:"#ffd700" }}>IQ</span> PREMIUM
           </div>
           <div style={{ fontSize:10, color:t.muted }}>Professional signals · Live scanner · Sniper analysis</div>
         </div>
