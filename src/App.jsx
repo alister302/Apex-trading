@@ -237,7 +237,7 @@ export default function App() {
               <div style={{fontFamily:"'Orbitron',sans-serif",fontSize:14,fontWeight:900,color:dark?"#fff":"#0044bb",letterSpacing:3}}>
                 PRINCEX <span style={{color:"#ffd700"}}>IQ</span>
               </div>
-              <div style={{fontSize:7,letterSpacing:2,color:t.dim}}>TRADING SIGNALS</div>
+              <div style={{fontSize:7,letterSpacing:2,color:t.dim}}>PRINCEX IQ</div>
             </div>
           </div>
 

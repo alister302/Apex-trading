@@ -195,7 +195,7 @@ export default function Splash({ onDone }) {
             fontSize:10, letterSpacing:4,
             color:"#334455", marginTop:4,
           }}>
-            TRADING SIGNALS PLATFORM
+            PRINCEX IQ
           </div>
         </div>
 
