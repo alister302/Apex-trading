@@ -74,7 +74,7 @@ export default function Auth({ onLogin }) {
           <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:24, fontWeight:900, color:"#fff", letterSpacing:4 }}>
             PRINCEX <span style={{ color:"#ffd700" }}>IQ</span>
           </div>
-          <div style={{ fontSize:9, color:"#2a4060", letterSpacing:3, marginTop:5 }}>TRADING SIGNALS PLATFORM</div>
+          <div style={{ fontSize:9, color:"#2a4060", letterSpacing:3, marginTop:5 }}>PRINCEX IQ PLATFORM</div>
         </div>
 
         <div style={{ fontSize:11, fontWeight:700, color:"#4499ff", letterSpacing:2, marginBottom:20, textAlign:"center" }}>
