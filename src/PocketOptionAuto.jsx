@@ -138,10 +138,17 @@ export default function PocketOptionAuto({ dark }) {
   }, []);
 
   const pingServer = async () => {
-    try {
-      const r = await fetch(`${SERVER}/health`, { signal: AbortSignal.timeout(15000) });
-      if (r.ok) setServerOnline(true);
-    } catch(e) { setServerOnline(false); }
+    for (let i = 0; i < 5; i++) {
+      try {
+        setStatus("Connecting to server" + (i > 0 ? " (attempt " + (i+1) + "/5)..." : "..."));
+        const r = await fetch(SERVER + "/health", { signal: AbortSignal.timeout(20000) });
+        if (r.ok) { setServerOnline(true); setStatus(""); return; }
+      } catch(e) {}
+      setStatus("Server waking up... (" + (i+1) + "/5) free tier sleeps after 15min");
+      await new Promise(r => setTimeout(r, 8000));
+    }
+    setServerOnline(false);
+    setStatus("Server offline - tap RETRY");
   };
 
   const getSignal = async () => {
