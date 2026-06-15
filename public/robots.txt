@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://apex-trading-eta.vercel.app/sitemap.xml
+Sitemap: https://princex-iq.vercel.app/sitemap.xml
