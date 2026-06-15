@@ -118,6 +118,7 @@ export default function PocketOptionAuto({ dark }) {
   const [running, setRunning] = useState(false);
   const [expanded, setExpanded] = useState(null);
   const [serverOnline, setServerOnline] = useState(false);
+  const [status, setStatus] = useState("");
   const intervalRef = useRef(null);
 
   const t = {
