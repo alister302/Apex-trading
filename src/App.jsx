@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import IQ from "./IQ";
+import Academy from "./Academy";
 import Quiz from "./Quiz";
 import Fast from "./Fast";
 import LongTerm from "./LongTerm";
@@ -318,7 +318,7 @@ export default function App() {
         )}
 
         {!showSub && <>
-          {tab==="iq" && <IQ dark={dark} />}
+          {tab==="iq" && <Academy dark={dark} />}
           {tab==="quiz" && <Quiz dark={dark} />}
           {tab==="fast" && <Fast dark={dark} />}
           {tab==="longterm" && <LongTerm dark={dark} />}
