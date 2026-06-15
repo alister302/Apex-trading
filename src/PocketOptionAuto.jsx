@@ -152,24 +152,13 @@ export default function PocketOptionAuto({ dark }) {
   };
 
   const getSignal = async () => {
-    // First wake the server
-    try {
-      await fetch(SERVER + '/health', { signal: AbortSignal.timeout(30000) });
-    } catch(e) {
-      // Server sleeping - still try main request
-    }
     setLoadingGet(true);
     setGetError("");
     setResult(null);
     setShowInds(false);
     try {
       const sym = encodeURIComponent(selectedPair.symbol);
-      // Wake server first
-      try { await fetch(SERVER + '/health', { signal: AbortSignal.timeout(10000) }); } catch(e) {}
-      
       const res = await fetch(`${SERVER}/po/get/${sym}`, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         signal: AbortSignal.timeout(60000),
       });
       // Check content type first
