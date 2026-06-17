@@ -120,6 +120,8 @@ export default function PocketOptionAuto({ dark }) {
   const [serverOnline, setServerOnline] = useState(false);
   const [status, setStatus] = useState("");
   const intervalRef = useRef(null);
+  const audioRef = useRef(null);
+  const prevSignalsRef = useRef({});
 
   const t = {
     bg: dark?"#050a0f":"#f0f4f8",

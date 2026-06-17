@@ -71,7 +71,10 @@ export default function LiveSignals({ dark }) {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("ALL");
   const [running, setRunning] = useState(true);
-  const [selectedPairs, setSelectedPairs] = useState(["EUR/USD","GBP/USD","XAU/USD","BTC/USD","ETH/USD"]);
+  const [selectedPairs, setSelectedPairs] = useState(["EUR/USD","CAD/JPY","GBP/AUD","EUR/GBP","EUR/CAD","GBP/CAD","GBP/JPY","AUD/USD","CHF/JPY","AUD/CHF","GBP/CHF","AUD/CAD","GBP/USD","USD/JPY","USD/CHF","USD/CAD","EUR/JPY","EUR/AUD","EUR/NZD","EUR/CHF","AUD/JPY","AUD/NZD","CAD/CHF","NZD/USD","NZD/JPY","NZD/CAD","NZD/CHF","XAU/USD","BTC/USD","ETH/USD"]);
+  const [soundOn, setSoundOn] = useState(true);
+  const audioCtxRef = useRef(null);
+  const prevSignalsRef = useRef({});
   const [selectedTF, setSelectedTF] = useState("5min");
   const [showPairPicker, setShowPairPicker] = useState(false);
   const [expandedSignal, setExpandedSignal] = useState(null);
@@ -98,11 +101,37 @@ export default function LiveSignals({ dark }) {
   const sColor = (s) => s==="BUY"?"#00dd55":s==="SELL"?"#ff2244":"#ffaa00";
   const sBg = (s) => s==="BUY"?(dark?"#001a0d":"#e8fff3"):s==="SELL"?(dark?"#1a0005":"#fff0f3"):(dark?"#1a1000":"#fffbe8");
 
+  const playAlertSound = () => {
+    try {
+      const ctx = audioCtxRef.current || (audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)());
+      const beep = (freq, start, dur) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = freq; osc.type = "sine";
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + start);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + dur);
+        osc.start(ctx.currentTime + start); osc.stop(ctx.currentTime + start + dur);
+      };
+      beep(880, 0, 0.15); beep(1100, 0.18, 0.15); beep(1320, 0.36, 0.2);
+    } catch(e) {}
+  };
+
   const fetchSignals = async () => {
     try {
-      const res = await fetch(`${SERVER}/signals`);
+      const res = await fetch(`${SERVER}/po/signals`);
       const data = await res.json();
-      setSignals(data.signals||{});
+      const newSignals = data.signals || {};
+
+      let hasNew = false;
+      Object.entries(newSignals).forEach(([sym, sig]) => {
+        const prev = prevSignalsRef.current[sym];
+        const actionable = sig.signal === "BUY" || sig.signal === "SELL";
+      });
+      if (hasNew && soundOn) playAlertSound();
+      prevSignalsRef.current = newSignals;
+
+      setSignals(newSignals);
       setLastUpdated(data.lastUpdated);
       setIsAnalyzing(data.isAnalyzing);
       setError(null);
@@ -135,7 +164,7 @@ export default function LiveSignals({ dark }) {
     return `${Math.floor(d/3600)}h ago`;
   };
 
-  const signalList = Object.values(signals).filter(s=>s.signal!=="WAIT");
+  const signalList = Object.values(signals).filter(s=>s.signal!=="WAIT" && s.confidence>=80).sort((a,b)=>b.confidence-a.confidence);
   const filtered = filter==="ALL"?signalList:filter==="BUY"?signalList.filter(s=>s.signal==="BUY"):filter==="SELL"?signalList.filter(s=>s.signal==="SELL"):filter==="FOREX"?signalList.filter(s=>s.type==="forex"):signalList.filter(s=>s.type==="crypto");
 
   const renderEntryPlan = (analysis, label) => {
@@ -217,6 +246,10 @@ export default function LiveSignals({ dark }) {
                 ? <button className="btn" onClick={() => setRunning(false)} style={{ background:"#ff224422", border:"1px solid #ff224444", color:"#ff2244", padding:"6px 12px", borderRadius:6, fontSize:9 }}>⏹ STOP</button>
                 : <button className="btn" onClick={() => { setRunning(true); fetchSignals(); }} style={{ background:"#00dd5522", border:"1px solid #00dd5544", color:"#00dd55", padding:"6px 12px", borderRadius:6, fontSize:9 }}>▶ START</button>
               }
+              <button className="btn" onClick={() => setSoundOn(!soundOn)}
+                style={{ background:soundOn?"#ffd70022":"transparent", border:`1px solid ${soundOn?"#ffd70044":t.border}`, color:soundOn?"#ffd700":t.textMuted, padding:"6px 10px", borderRadius:6, fontSize:9 }}>
+                {soundOn?"🔔":"🔕"}
+              </button>
             </div>
           </div>
 
