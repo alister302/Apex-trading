@@ -141,8 +141,14 @@ export default function LiveSignals({ dark }) {
 
   useEffect(() => {
     fetchSignals();
-    intervalRef.current = setInterval(() => { if(running) fetchSignals(); }, 30000);
+    // Always poll every 30 seconds regardless of running state
+    intervalRef.current = setInterval(() => { fetchSignals(); }, 30000);
     return () => clearInterval(intervalRef.current);
+  }, []);
+
+  // Separate effect to trigger manual scan when running toggled on
+  useEffect(() => {
+    if (running) fetchSignals();
   }, [running]);
 
   const runManual = async () => {
@@ -164,8 +170,15 @@ export default function LiveSignals({ dark }) {
     return `${Math.floor(d/3600)}h ago`;
   };
 
-  const signalList = Object.values(signals).filter(s=>s.signal!=="WAIT" && s.confidence>=80).sort((a,b)=>b.confidence-a.confidence);
-  const filtered = filter==="ALL"?signalList:filter==="BUY"?signalList.filter(s=>s.signal==="BUY"):filter==="SELL"?signalList.filter(s=>s.signal==="SELL"):filter==="FOREX"?signalList.filter(s=>s.type==="forex"):signalList.filter(s=>s.type==="crypto");
+  // Only show BUY/SELL with 80%+ confidence sorted by confidence
+  const signalList = Object.values(signals)
+    .filter(s => (s.signal==="BUY" || s.signal==="SELL") && s.confidence>=80)
+    .sort((a,b) => b.confidence - a.confidence);
+  const filtered = filter==="ALL" ? signalList
+    : filter==="BUY"  ? signalList.filter(s=>s.signal==="BUY")
+    : filter==="SELL" ? signalList.filter(s=>s.signal==="SELL")
+    : filter==="FOREX"? signalList.filter(s=>s.type==="forex")
+    : signalList.filter(s=>s.type==="crypto"||s.type==="commodity");
 
   const renderEntryPlan = (analysis, label) => {
     if (!analysis || analysis.signal === "WAIT") return null;
@@ -253,13 +266,39 @@ export default function LiveSignals({ dark }) {
             </div>
           </div>
 
+          {/* Top Signal Banner */}
+          {signalList.length > 0 && (
+            <div style={{ background:signalList[0].signal==="BUY"?(dark?"#001a0d":"#e8fff3"):(dark?"#1a0005":"#fff0f3"), border:`3px solid ${signalList[0].signal==="BUY"?"#00dd55":"#ff2244"}`, borderRadius:12, padding:"14px 16px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div>
+                <div style={{ fontSize:9, letterSpacing:2, color:signalList[0].signal==="BUY"?"#00dd55":"#ff2244", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700, marginBottom:4 }}>🏆 TOP SIGNAL NOW</div>
+                <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, fontWeight:900, color:dark?"#fff":"#001133" }}>{signalList[0].symbol}</div>
+                <div style={{ fontSize:10, color:dark?"#8899aa":"#445566", fontFamily:"'IBM Plex Mono',monospace" }}>{signalList[0].pattern} · Buyers:{signalList[0].buyers||"?"}% Sellers:{signalList[0].sellers||"?"}%</div>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:32, fontWeight:900, color:signalList[0].signal==="BUY"?"#00dd55":"#ff2244" }}>
+                  {signalList[0].signal==="BUY"?"▲":"▼"} {signalList[0].signal}
+                </div>
+                <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, fontWeight:700, color:signalList[0].signal==="BUY"?"#00dd55":"#ff2244" }}>{signalList[0].confidence}%</div>
+              </div>
+            </div>
+          )}
+          {signalList.length === 0 && !loading && (
+            <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:"12px 16px", marginBottom:12, textAlign:"center" }}>
+              <div style={{ fontSize:11, color:t.textDim, fontFamily:"'IBM Plex Mono',monospace" }}>⏳ Scanning 30 pairs — no 80%+ signals yet</div>
+            </div>
+          )}
+
           {/* Stats */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:12 }}>
-            {[{l:"SIGNALS",v:signalList.length,c:dark?"#c8d8e8":"#1a2a3a"},{l:"BUY",v:signalList.filter(s=>s.signal==="BUY").length,c:"#00dd55"},{l:"SELL",v:signalList.filter(s=>s.signal==="SELL").length,c:"#ff2244"}]
-              .map(({l,v,c}) => (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:8, marginBottom:12 }}>
+            {[
+              {l:"SCANNED", v:"30",                                              c:dark?"#c8d8e8":"#1a2a3a"},
+              {l:"80%+ SIGNALS", v:signalList.length,                            c:"#ffd700"},
+              {l:"BUY",  v:signalList.filter(s=>s.signal==="BUY").length,        c:"#00dd55"},
+              {l:"SELL", v:signalList.filter(s=>s.signal==="SELL").length,       c:"#ff2244"},
+            ].map(({l,v,c}) => (
               <div key={l} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"10px", textAlign:"center" }}>
-                <div style={{ fontSize:8, letterSpacing:2, color:t.textLabel, fontFamily:"'IBM Plex Mono',monospace", marginBottom:3 }}>{l}</div>
-                <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:20, fontWeight:900, color:c }}>{v}</div>
+                <div style={{ fontSize:7, letterSpacing:1, color:t.textLabel, fontFamily:"'IBM Plex Mono',monospace", marginBottom:3 }}>{l}</div>
+                <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:c }}>{v}</div>
               </div>
             ))}
           </div>
