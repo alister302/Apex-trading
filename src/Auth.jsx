@@ -124,9 +124,9 @@ export default function Auth({ onLogin }) {
 
         <div style={{ marginTop:24, fontSize:8, color:"#1a2a3a", textAlign:"center", letterSpacing:1 }}>PRINCEX IQ · PRINCE X TOOLS · TRADING INVOLVES RISK</div>
 
-      {/* Affiliate Modal */}
-      {showAffiliate && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+      {/* placeholder */}
+      {false && (
+        <div>
           <div style={{ background:"#020810", border:"2px solid #00cc4444", borderRadius:18, padding:"32px 24px", width:"100%", maxWidth:400, textAlign:"center", fontFamily:"'IBM Plex Mono',monospace" }}>
             
             {/* OlympTrade Logo */}
@@ -173,4 +173,64 @@ export default function Auth({ onLogin }) {
       </div>
     </div>
   );
+
+  // Affiliate modal rendered at root level
+  if (showAffiliate) return (
+    <div style={{ minHeight:"100vh", background:"#020810", display:"flex", alignItems:"center", justifyContent:"center", padding:20, fontFamily:"'IBM Plex Mono',monospace" }}>
+      <div style={{ background:"#030c18", border:"2px solid #00cc4444", borderRadius:18, padding:"32px 24px", width:"100%", maxWidth:400, textAlign:"center" }}>
+        
+        <div style={{ fontSize:32, marginBottom:12 }}>🎉</div>
+        
+        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:"#00cc44", letterSpacing:2, marginBottom:8 }}>
+          ACCOUNT CREATED!
+        </div>
+
+        <div style={{ fontSize:13, color:"#fff", fontWeight:700, marginBottom:12, lineHeight:1.6 }}>
+          Welcome to PrinceX IQ!
+        </div>
+
+        <div style={{ background:"rgba(0,200,68,0.05)", border:"1px solid #00cc4422", borderRadius:10, padding:"14px", marginBottom:20 }}>
+          <div style={{ fontSize:11, color:"#8899aa", lineHeight:1.9 }}>
+            Our signals are optimized for{" "}
+            <strong style={{ color:"#00cc44" }}>OlympTrade</strong> — one of the most trusted binary trading platforms in Kenya.
+            <br/><br/>
+            To start trading with our signals, you need a free OlympTrade account.
+            <br/>
+            <strong style={{ color:"#ffd700" }}>Get a welcome bonus when you register! 🎁</strong>
+          </div>
+        </div>
+
+        {/* OlympTrade logo */}
+        <div style={{ width:70, height:70, margin:"0 auto 16px", borderRadius:14, background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 20px #00cc4433" }}>
+          <img 
+            src="https://olymptrade.com/favicon.ico" 
+            alt="OlympTrade" 
+            style={{ width:50, height:50, objectFit:"contain" }}
+            onError={e => { e.target.outerHTML = '<div style="font-size:36px">📈</div>'; }}
+          />
+        </div>
+
+        <a href="https://trkmad.com/2575974" target="_blank" rel="noopener noreferrer"
+          style={{ display:"block", padding:"16px", background:"linear-gradient(135deg,#00cc44,#007722)", color:"#fff", borderRadius:10, fontSize:13, fontWeight:900, letterSpacing:2, textDecoration:"none", marginBottom:10, boxShadow:"0 4px 20px #00cc4444" }}>
+          📈 REGISTER ON OLYMPTRADE FREE →
+        </a>
+
+        <div style={{ fontSize:9, color:"#556677", marginBottom:16 }}>
+          Free to register · Trade from $1 · Mobile app available
+        </div>
+
+        <button onClick={() => setShowAffiliate(false)}
+          style={{ background:"transparent", border:"1px solid #1e3040", color:"#445566", padding:"10px 28px", borderRadius:6, fontSize:10, cursor:"pointer", fontFamily:"'IBM Plex Mono',monospace", width:"100%" }}>
+          I already have an OlympTrade account →
+        </button>
+
+        <div style={{ marginTop:14, fontSize:8, color:"#2a3a4a" }}>
+          * This is an affiliate link — we earn a small commission at no extra cost to you
+        </div>
+      </div>
+    </div>
+  );
+
+  return null;
 }
+
