@@ -10,6 +10,7 @@ export default function Auth({ onLogin }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [showAffiliate, setShowAffiliate] = useState(false);
 
   const reset = () => { setError(""); setSuccess(""); };
 
@@ -20,7 +21,9 @@ export default function Auth({ onLogin }) {
     const { error: e } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { full_name: name.trim() } } });
     setLoading(false);
     if (e) setError(e.message);
-    else { setSuccess("Account created! You can now sign in."); setTimeout(() => setMode("login"), 2000); }
+    else { setSuccess("Account created! You can now sign in.");
+      setShowAffiliate(true);
+      setTimeout(() => setMode("login"), 4000); }
   };
 
   const handleLogin = async () => {
@@ -120,6 +123,53 @@ export default function Auth({ onLogin }) {
         </div>
 
         <div style={{ marginTop:24, fontSize:8, color:"#1a2a3a", textAlign:"center", letterSpacing:1 }}>PRINCEX IQ · PRINCE X TOOLS · TRADING INVOLVES RISK</div>
+
+      {/* Affiliate Modal */}
+      {showAffiliate && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div style={{ background:"#020810", border:"2px solid #00cc4444", borderRadius:18, padding:"32px 24px", width:"100%", maxWidth:400, textAlign:"center", fontFamily:"'IBM Plex Mono',monospace" }}>
+            
+            {/* OlympTrade Logo */}
+            <div style={{ width:80, height:80, margin:"0 auto 16px", borderRadius:16, overflow:"hidden", border:"2px solid #00cc4433", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff" }}>
+              <img src="https://olymptrade.com/favicon.ico" alt="OlympTrade" style={{ width:60, height:60, objectFit:"contain" }} 
+                onError={e => { e.target.style.display="none"; e.target.parentElement.innerHTML='<div style="font-size:32px">📈</div>'; }} />
+            </div>
+
+            <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:"#00cc44", letterSpacing:2, marginBottom:8 }}>
+              ONE MORE STEP!
+            </div>
+
+            <div style={{ fontSize:13, color:"#fff", fontWeight:700, marginBottom:12, lineHeight:1.6 }}>
+              Welcome to PrinceX IQ! 🎉
+            </div>
+
+            <div style={{ fontSize:11, color:"#8899aa", lineHeight:1.8, marginBottom:20 }}>
+              Our signals are optimized for <strong style={{ color:"#00cc44" }}>OlympTrade</strong> — one of the most trusted trading platforms.
+              <br/><br/>
+              To use these signals, you need an OlympTrade account. Register now and get a <strong style={{ color:"#ffd700" }}>welcome bonus!</strong>
+            </div>
+
+            <a href="https://trkmad.com/2575974" target="_blank" rel="noopener noreferrer"
+              style={{ display:"block", padding:"16px", background:"linear-gradient(135deg,#00cc44,#009933)", color:"#fff", borderRadius:10, fontSize:13, fontWeight:900, letterSpacing:2, textDecoration:"none", marginBottom:12 }}>
+              📈 REGISTER ON OLYMPTRADE FREE →
+            </a>
+
+            <div style={{ fontSize:9, color:"#445566", marginBottom:16 }}>
+              Free to register · Trade from $1 · 24/7 support
+            </div>
+
+            <button onClick={() => setShowAffiliate(false)}
+              style={{ background:"transparent", border:"1px solid #1e3040", color:"#445566", padding:"8px 24px", borderRadius:6, fontSize:10, cursor:"pointer", fontFamily:"'IBM Plex Mono',monospace" }}>
+              I already have an account
+            </button>
+
+            <div style={{ marginTop:12, fontSize:8, color:"#2a3a4a" }}>
+              * Affiliate link — we earn a small commission at no cost to you
+            </div>
+          </div>
+        </div>
+      )}
+
       </div>
     </div>
   );
