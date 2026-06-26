@@ -49,6 +49,7 @@ export default function App() {
   const [err, setErr] = useState(null);
   const [history, setHistory] = useState([]);
   const [drag, setDrag] = useState(false);
+  const [showAffiliate, setShowAffiliate] = useState(false);
   const fileRef = useRef();
 
   useEffect(() => {
@@ -68,6 +69,23 @@ export default function App() {
     const orderId = localStorage.getItem("apex_order_id");
     if (trackId && orderId) verifyPayment(trackId, orderId);
   }, [user]);
+
+  // Check if user has seen affiliate page
+  useEffect(() => {
+    if (user) {
+      const seen = localStorage.getItem('princex_affiliate_seen_' + user.id);
+      if (!seen) setShowAffiliate(true);
+    }
+  }, [user]);
+
+  const dismissAffiliate = (clicked) => {
+    if (clicked) {
+      localStorage.setItem('princex_affiliate_seen_' + user.id, 'clicked');
+    } else {
+      localStorage.setItem('princex_affiliate_seen_' + user.id, 'dismissed');
+    }
+    setShowAffiliate(false);
+  };
 
   const checkSub = async () => {
     try {
@@ -183,6 +201,68 @@ export default function App() {
   );
   if (!user) return <Auth onLogin={u => setUser(u)} />;
   if (showAdmin && isAdmin) return <AdminDashboard dark={dark} onExit={() => setShowAdmin(false)} />;
+
+  // Show affiliate page for users who haven't seen it
+  if (showAffiliate) return (
+    <div style={{ minHeight:"100vh", background:"#020810", display:"flex", alignItems:"center", justifyContent:"center", padding:20, fontFamily:"'IBM Plex Mono',monospace" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=IBM+Plex+Mono:wght@400;700&display=swap');`}</style>
+      <div style={{ background:"#030c18", border:"2px solid #00cc4444", borderRadius:18, padding:"32px 24px", width:"100%", maxWidth:420, textAlign:"center" }}>
+
+        {/* PrinceX IQ logo */}
+        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, fontWeight:900, color:"#fff", letterSpacing:3, marginBottom:4 }}>
+          PRINCEX <span style={{ color:"#ffd700" }}>IQ</span>
+        </div>
+        <div style={{ fontSize:9, color:"#445566", letterSpacing:2, marginBottom:24 }}>TRADING INTELLIGENCE PLATFORM</div>
+
+        <div style={{ fontSize:28, marginBottom:12 }}>📈</div>
+
+        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:14, fontWeight:900, color:"#00cc44", letterSpacing:2, marginBottom:16 }}>
+          START TRADING NOW
+        </div>
+
+        <div style={{ background:"rgba(0,200,68,0.06)", border:"1px solid #00cc4422", borderRadius:12, padding:"16px", marginBottom:20, textAlign:"left" }}>
+          <div style={{ fontSize:11, color:"#8899aa", lineHeight:2 }}>
+            ✅ PrinceX IQ signals are <strong style={{ color:"#fff" }}>optimized for OlympTrade</strong><br/>
+            ✅ Works on <strong style={{ color:"#ffd700" }}>Forex, Crypto & Commodities</strong><br/>
+            ✅ Trade from as little as <strong style={{ color:"#00cc44" }}>$1</strong><br/>
+            ✅ Available on <strong style={{ color:"#fff" }}>Android & iOS</strong><br/>
+            ✅ Get a <strong style={{ color:"#ffd700" }}>welcome deposit bonus 🎁</strong>
+          </div>
+        </div>
+
+        {/* OlympTrade logo */}
+        <div style={{ width:64, height:64, margin:"0 auto 16px", borderRadius:12, background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 24px #00cc4433" }}>
+          <img src="https://olymptrade.com/favicon.ico" alt="OlympTrade"
+            style={{ width:48, height:48, objectFit:"contain" }}
+            onError={e => { e.target.outerHTML='<div style="font-size:30px">📊</div>'; }} />
+        </div>
+
+        <a href="https://trkmad.com/2575974" target="_blank" rel="noopener noreferrer"
+          onClick={() => dismissAffiliate(true)}
+          style={{ display:"block", padding:"16px", background:"linear-gradient(135deg,#00cc44,#007722)", color:"#fff", borderRadius:10, fontSize:13, fontWeight:900, letterSpacing:2, textDecoration:"none", marginBottom:10, boxShadow:"0 4px 24px #00cc4455" }}>
+          📈 OPEN FREE OLYMPTRADE ACCOUNT →
+        </a>
+
+        <div style={{ fontSize:9, color:"#445566", marginBottom:16 }}>
+          Free to register · No credit card needed · Instant access
+        </div>
+
+        <button onClick={() => dismissAffiliate(false)}
+          style={{ background:"transparent", border:"1px solid #1e3040", color:"#445566", padding:"10px", borderRadius:6, fontSize:10, cursor:"pointer", fontFamily:"'IBM Plex Mono',monospace", width:"100%", marginBottom:12 }}>
+          I already have an OlympTrade account →
+        </button>
+
+        <button onClick={() => dismissAffiliate(false)}
+          style={{ background:"transparent", border:"none", color:"#2a3a4a", padding:"6px", fontSize:9, cursor:"pointer", fontFamily:"'IBM Plex Mono',monospace", width:"100%" }}>
+          Skip for now
+        </button>
+
+        <div style={{ marginTop:12, fontSize:8, color:"#1e2e3e" }}>
+          * Affiliate link — we earn a small commission at no cost to you
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{height:"100vh",background:t.bg,color:t.text,fontFamily:"'IBM Plex Mono',monospace",display:"flex",flexDirection:"column",overflow:"hidden"}}>
