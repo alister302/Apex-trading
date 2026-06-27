@@ -230,7 +230,7 @@ export default function LiveSignals({ dark }) {
 
         {/* Sub tabs */}
         <div style={{ display:"flex", gap:6, marginBottom:14, background:t.bgCard, borderRadius:10, padding:5, border:`1px solid ${t.border}` }}>
-          {[["auto","📡 AUTO"],["manual","🎯 SNIPER SCAN"],["po","🟢 POCKET OPTION"],["exness","📊 EXNESS"]].map(([id,lb]) => (
+          {[["auto","📡 AUTO"],["manual","🎯 SNIPER SCAN"],["po","🟢 OLYMP SIGNALS"],["exness","📊 EXNESS"]].map(([id,lb]) => (
             <button key={id} className="btn" onClick={() => setActiveTab(id)}
               style={{ flex:1, padding:"10px", background:activeTab===id?"#0066ff":"transparent", color:activeTab===id?"#fff":t.textMuted, borderRadius:7, fontSize:11, letterSpacing:1 }}>
               {lb}
