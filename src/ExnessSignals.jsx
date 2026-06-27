@@ -220,6 +220,7 @@ export default function ExnessSignals({ dark }) {
   const [history, setHistory] = useState([]);
   const [scanProgress, setScanProgress] = useState(0);
   const [expandedPair, setExpandedPair] = useState(null);
+  const [timeframe, setTimeframe] = useState("1h");
   const intervalRef = useRef(null);
   const prevSignalsRef = useRef({});
 
@@ -238,7 +239,7 @@ export default function ExnessSignals({ dark }) {
   const getSignal = async () => {
     setLoadingGet(true); setGetError(""); setResult(null);
     try {
-      const res = await fetch(`${SERVER}/exness/get/${encodeURIComponent(selectedPair)}`, { signal: AbortSignal.timeout(60000) });
+      const res = await fetch(`${SERVER}/exness/get/${encodeURIComponent(selectedPair)}?tf=${timeframe}`, { signal: AbortSignal.timeout(60000) });
       const contentType = res.headers.get("content-type")||"";
       if (!contentType.includes("json")) { setGetError("Server starting up — wait 30s and retry"); setLoadingGet(false); return; }
       const data = await res.json();
@@ -254,7 +255,7 @@ export default function ExnessSignals({ dark }) {
 
   const fetchAutoSignals = async () => {
     try {
-      const res = await fetch(`${SERVER}/exness/signals`, { signal: AbortSignal.timeout(15000) });
+      const res = await fetch(`${SERVER}/exness/signals?tf=${timeframe}`, { signal: AbortSignal.timeout(15000) });
       const ct = res.headers.get("content-type")||"";
       if (!ct.includes("json")) { setAutoError("Server offline — retrying..."); return; }
       const data = await res.json();
@@ -373,6 +374,16 @@ export default function ExnessSignals({ dark }) {
           </button>
         </div>
 
+
+        {/* Timeframe Selector */}
+        <div style={{ display:"flex", gap:5, marginBottom:12, flexWrap:"wrap" }}>
+          {[["1min","1M"],["5min","5M"],["15min","15M"],["30min","30M"],["1h","1H"],["4h","4H"],["1day","1D"]].map(([val,label])=>(
+            <button key={val} className="exbtn" onClick={()=>setTimeframe(val)}
+              style={{ padding:"5px 12px", background:timeframe===val?"#ffd700":"transparent", border:`1px solid ${timeframe===val?"#ffd700":t.border}`, color:timeframe===val?"#000":t.muted, borderRadius:5, fontSize:9, letterSpacing:1 }}>
+              {label}
+            </button>
+          ))}
+        </div>
         {/* ===== GET SIGNAL ===== */}
         {mode==="get" && (
           <div className="exslide">
@@ -385,7 +396,7 @@ export default function ExnessSignals({ dark }) {
                 </div>
                 <iframe
                   key={selectedPair}
-                  src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair]||"FX:EURUSD")}&interval=60&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
+                  src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair]||"FX:EURUSD")}&interval=${{"1min":"1","5min":"5","15min":"15","30min":"30","1h":"60","4h":"240","1day":"D"}[timeframe]||"60"}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
                   style={{ width:"100%", height:220, border:"none", display:"block" }}
                   title={selectedPair}
                   loading="lazy"
