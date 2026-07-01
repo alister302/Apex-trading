@@ -84,7 +84,6 @@ export default function AdminDashboard({ dark, onExit }) {
           <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:13, fontWeight:900, color:"#ffd700", letterSpacing:2 }}>⚡ ADMIN DASHBOARD</div>
           <button className="adm-btn" onClick={onExit} style={{ background:"#ff224422", color:"#ff4466", padding:"6px 12px" }}>← EXIT</button>
               <button className="adm-btn" onClick={async()=>{ await supabase.auth.signOut(); onExit(); }} style={{ background:"#ff000033", color:"#ff4444", padding:"6px 12px", border:"1px solid #ff000044" }}>🔒 LOGOUT</button>
-          <button className="adm-btn" onClick={()=>{ import("../supabase").then(m=>m.supabase.auth.signOut()); onExit(); }} style={{ background:"#ff000022", color:"#ff0000", padding:"6px 12px" }}>🔒 LOGOUT</button>
         </div>
       </div>
 
