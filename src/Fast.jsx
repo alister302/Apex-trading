@@ -81,7 +81,6 @@ export default function Fast({ dark }) {
           }],
           generationConfig: {
             thinkingConfig: { thinkingBudget: 0 },
-            thinkingConfig: { thinkingBudget: 0 },
             temperature: 0.1,
             maxOutputTokens: 200,
             responseMimeType: "application/json"
