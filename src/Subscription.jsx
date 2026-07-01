@@ -3,10 +3,10 @@ import { useState, useEffect, useRef } from "react";
 const SERVER = "https://apex-server-09p7.onrender.com";
 
 const PLANS = [
-  { id:"weekly",   name:"WEEKLY",   price:299,   period:"7 days",   color:"#0066ff", features:["All live signals","Sniper scanner","Auto analysis","Push notifications"] },
-  { id:"monthly",  name:"MONTHLY",  price:799,   period:"30 days",  color:"#00aaff", popular:true, features:["All live signals","Sniper scanner","Auto analysis","Push notifications","Priority support"] },
-  { id:"annual",   name:"ANNUAL",   price:6999,  period:"365 days", color:"#00dd88", features:["All live signals","Sniper scanner","Auto analysis","Push notifications","Save 27%"] },
-  { id:"lifetime", name:"LIFETIME", price:14999, period:"Forever",  color:"#ffd700", features:["All live signals","Sniper scanner","Auto analysis","VIP access","Never expires"] },
+  { id:"weekly",   name:"WEEKLY",   price:499,   period:"7 days",   color:"#0066ff", features:["All live signals","Sniper scanner","Auto analysis","Push notifications"] },
+  { id:"monthly",  name:"MONTHLY",  price:1499,   period:"30 days",  color:"#00aaff", popular:true, features:["All live signals","Sniper scanner","Auto analysis","Push notifications","Priority support"] },
+  { id:"annual",   name:"ANNUAL",   price:9999,  period:"365 days", color:"#00dd88", features:["All live signals","Sniper scanner","Auto analysis","Push notifications","Save 27%"] },
+  { id:"lifetime", name:"LIFETIME", price:19999, period:"Forever",  color:"#ffd700", features:["All live signals","Sniper scanner","Auto analysis","VIP access","Never expires"] },
 ];
 
 export default function Subscription({ user, sub, onSubscribed, dark }) {
