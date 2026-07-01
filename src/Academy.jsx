@@ -856,13 +856,12 @@ export default function IQ({ dark }) {
             {lesson.content.split("\n").map((line, i) => (
               <div key={i} style={{
                 fontSize: line.startsWith("•") || line.startsWith("✓") || line.startsWith("✗") || line.startsWith("□") ? 13 : line === "" ? 6 : 13,
-                color: line.startsWith("•") || line.startsWith("✓") ? (dark ? "#aaccee" : "#223344") : line.startsWith("✗") ? "#ee4444" : line === "" ? "transparent" : t.text,
+                color: line.match(/^[A-Z\s&\/\(\)]+$/) && line.length > 3 && !line.startsWith("•") && !line.startsWith("✓") && !line.startsWith("✗") ? (dark ? "#4499ff" : "#0044cc") : line.startsWith("•") || line.startsWith("✓") ? (dark ? "#aaccee" : "#223344") : line.startsWith("✗") ? "#ee4444" : line === "" ? "transparent" : t.text,
                 fontFamily: "'IBM Plex Mono', monospace",
                 lineHeight: line === "" ? "0.4" : "1.8",
                 marginBottom: line === "" ? 8 : 2,
                 paddingLeft: (line.startsWith("•") || line.startsWith("✓") || line.startsWith("✗") || line.startsWith("□")) ? 8 : 0,
                 fontWeight: (line.endsWith(":") || line.startsWith("STEP") || line.match(/^[A-Z\s&\/]+$/) && line.length > 3 && !line.startsWith("•")) ? 700 : 400,
-                color: line.match(/^[A-Z\s&\/\(\)]+$/) && line.length > 3 && !line.startsWith("•") && !line.startsWith("✓") && !line.startsWith("✗") ? (dark ? "#4499ff" : "#0044cc") : undefined,
               }}>{line || " "}</div>
             ))}
           </div>
