@@ -83,7 +83,7 @@ export default function AffiliatePage({ user, supabase, onVerified }) {
               </div>
             </div>
 
-            <a href="https://trkmad.com/2575974" target="_blank" rel="noopener noreferrer"
+            <a href="https://static.olymptrade.com/lands/GA-LPL65-01-02en/index.html?af_siteid=GA-LPL65-01-02en&affiliate_id=2575974&lref=&lrefch=affiliate&pixel=1&subid1=&subid2=" target="_blank" rel="noopener noreferrer"
               style={{ display:"block", padding:"16px", background:"linear-gradient(135deg,#00cc44,#007722)", color:"#fff", borderRadius:10, fontSize:13, fontWeight:900, letterSpacing:2, textDecoration:"none", marginBottom:12, boxShadow:"0 4px 24px #00cc4455" }}>
               📈 OPEN FREE ACCOUNT ON OLYMPTRADE
             </a>
