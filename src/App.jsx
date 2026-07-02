@@ -12,6 +12,7 @@ import Subscription from "./Subscription";
 import AdminDashboard from "./AdminDashboard";
 import { supabase } from "./supabase";
 import AffiliatePage from "./AffiliatePage";
+import InfluencerPage from "./InfluencerPage";
 
 const SERVER = "https://apex-server-09p7.onrender.com";
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
@@ -51,6 +52,7 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [drag, setDrag] = useState(false);
   const [showAffiliate, setShowAffiliate] = useState(false);
+  const [showInfluencer, setShowInfluencer] = useState(false);
   const fileRef = useRef();
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export default function App() {
   // Check Supabase if user has OlympTrade ID
   useEffect(() => {
     if (!user) return;
+    saveReferral(user.id);
     const checkOlympTrade = async () => {
       const { data } = await supabase
         .from("profiles")
@@ -88,6 +91,13 @@ export default function App() {
     };
     checkOlympTrade();
   }, [user]);
+
+  const saveReferral = async (userId) => {
+    const ref = localStorage.getItem('princex_ref');
+    if (!ref) return;
+    await supabase.from('profiles').update({ referred_by: ref }).eq('id', userId);
+    localStorage.removeItem('princex_ref');
+  };
 
   const checkSub = async () => {
     try {
@@ -228,6 +238,9 @@ export default function App() {
       `}</style>
 
       {/* ADMIN PASSKEY MODAL */}
+      {showInfluencer && (
+        <InfluencerPage user={user} supabase={supabase} dark={dark} onClose={()=>setShowInfluencer(false)} />
+      )}
       {adminPrompt && (
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div style={{background:dark?"#030810":"#fff",border:"1px solid #ffd70033",borderRadius:14,padding:28,width:"100%",maxWidth:360,boxShadow:"0 0 40px #ffd70022"}}>

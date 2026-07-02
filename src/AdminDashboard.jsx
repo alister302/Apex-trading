@@ -7,6 +7,8 @@ export default function AdminDashboard({ dark, onExit }) {
   const [tab, setTab] = useState("stats");
   const [users, setUsers] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [influencers, setInfluencers] = useState([]);
+  const [adminPayouts, setAdminPayouts] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
@@ -38,6 +40,18 @@ export default function AdminDashboard({ dark, onExit }) {
     setLoading(false);
   };
 
+  const fetchInfluencers = async () => {
+    const res = await fetch(`${SERVER}/admin/influencers`, { headers });
+    const data = await res.json();
+    setInfluencers(data.influencers||[]);
+  };
+
+  const fetchAdminPayouts = async () => {
+    const res = await fetch(`${SERVER}/admin/payouts`, { headers });
+    const data = await res.json();
+    setAdminPayouts(data.payouts||[]);
+  };
+
   const fetchPayments = async () => {
     setLoading(true);
     const res = await fetch(`${SERVER}/admin/payments`, { headers });
@@ -50,7 +64,25 @@ export default function AdminDashboard({ dark, onExit }) {
     fetchStats();
     fetchUsers();
     fetchPayments();
+    fetchInfluencers();
+    fetchAdminPayouts();
   }, []);
+
+  const updateInfluencerStatus = async (id, status) => {
+    await fetch(`${SERVER}/admin/influencer/status`, {
+      method:"POST", headers, body:JSON.stringify({ influencer_id:id, status })
+    });
+    setMsg("✓ Influencer status updated to "+status);
+    fetchInfluencers();
+  };
+
+  const markPayoutPaid = async (id) => {
+    await fetch(`${SERVER}/admin/payout/pay`, {
+      method:"POST", headers, body:JSON.stringify({ payout_id:id })
+    });
+    setMsg("✓ Payout marked as paid");
+    fetchAdminPayouts();
+  };
 
   const grantSub = async (userId, plan) => {
     setMsg("");
@@ -72,7 +104,7 @@ export default function AdminDashboard({ dark, onExit }) {
     if (data.success) { setMsg("✓ User promoted to admin"); fetchUsers(); }
   };
 
-  const TABS = [["stats","📊 STATS"],["users","👥 USERS"],["payments","💳 PAYMENTS"]];
+  const TABS = [["stats","📊 STATS"],["users","👥 USERS"],["payments","💳 PAYMENTS"],["influencers","💼 PARTNERS"],["payouts","💰 PAYOUTS"]];
 
   return (
     <div style={{ minHeight:"100vh", background:t.bg, fontFamily:"'IBM Plex Mono',monospace", color:t.text }}>
@@ -143,6 +175,58 @@ export default function AdminDashboard({ dark, onExit }) {
                     <button className="adm-btn" onClick={()=>revokeSub(u.id)} style={{ background:"#ff224422", color:"#ff4466", border:"1px solid #ff224433" }}>REVOKE</button>
                     {u.role!=="admin" && <button className="adm-btn" onClick={()=>promotePlan(u.id)} style={{ background:"#ffd70022", color:"#ffd700", border:"1px solid #ffd70033" }}>PROMOTE</button>}
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* INFLUENCERS */}
+        {tab==="influencers" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ fontSize:10, color:t.label, fontWeight:700, letterSpacing:2 }}>PARTNERS ({influencers.length})</div>
+              <button className="adm-btn" onClick={fetchInfluencers} style={{ background:"#0066ff22", color:"#4499ff", padding:"6px 12px" }}>⟳ REFRESH</button>
+            </div>
+            {influencers.map(inf=>(
+              <div key={inf.id} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:"12px 14px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:8 }}>
+                  <div>
+                    <div style={{ fontSize:12, color:dark?"#fff":"#001133", fontWeight:700 }}>{inf.full_name}</div>
+                    <div style={{ fontSize:10, color:t.muted }}>M-Pesa: {inf.mpesa_number} · ID: {inf.national_id}</div>
+                    <div style={{ fontSize:10, color:"#ffd700", fontWeight:700 }}>Code: {inf.referral_code}</div>
+                    <div style={{ display:"flex", gap:6, marginTop:4 }}>
+                      <span style={{ fontSize:8, padding:"2px 7px", background:inf.status==="approved"?"#00dd5522":inf.status==="pending"?"#ffaa0022":"#ff224422", border:`1px solid ${inf.status==="approved"?"#00dd5533":inf.status==="pending"?"#ffaa0033":"#ff224433"}`, color:inf.status==="approved"?"#00dd55":inf.status==="pending"?"#ffaa00":"#ff4466", borderRadius:4, fontWeight:700 }}>{inf.status?.toUpperCase()}</span>
+                      <span style={{ fontSize:8, color:t.dim }}>Referrals: {inf.total_referrals} · Earned: KES {inf.total_earnings?.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div style={{ display:"flex", gap:5 }}>
+                    {inf.status!=="approved" && <button className="adm-btn" onClick={()=>updateInfluencerStatus(inf.id,"approved")} style={{ background:"#00dd5522", color:"#00dd55", border:"1px solid #00dd5533" }}>✓ APPROVE</button>}
+                    {inf.status!=="suspended" && <button className="adm-btn" onClick={()=>updateInfluencerStatus(inf.id,"suspended")} style={{ background:"#ff224422", color:"#ff4466", border:"1px solid #ff224433" }}>SUSPEND</button>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* PAYOUTS */}
+        {tab==="payouts" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ fontSize:10, color:t.label, fontWeight:700, letterSpacing:2 }}>PAYOUT REQUESTS ({adminPayouts.length})</div>
+              <button className="adm-btn" onClick={fetchAdminPayouts} style={{ background:"#0066ff22", color:"#4499ff", padding:"6px 12px" }}>⟳ REFRESH</button>
+            </div>
+            {adminPayouts.map(p=>(
+              <div key={p.id} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"10px 14px", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+                <div>
+                  <div style={{ fontSize:12, color:dark?"#fff":"#001133", fontWeight:700 }}>{p.influencers?.full_name}</div>
+                  <div style={{ fontSize:10, color:t.muted }}>KES {p.amount?.toLocaleString()} → {p.influencers?.mpesa_number}</div>
+                  <div style={{ fontSize:9, color:t.dim }}>{new Date(p.created_at).toLocaleDateString()}</div>
+                </div>
+                <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                  <span style={{ fontSize:9, padding:"3px 10px", background:p.status==="paid"?"#00dd5522":"#ffaa0022", border:`1px solid ${p.status==="paid"?"#00dd5533":"#ffaa0033"}`, color:p.status==="paid"?"#00dd55":"#ffaa00", borderRadius:5, fontWeight:700 }}>{p.status?.toUpperCase()}</span>
+                  {p.status==="pending" && <button className="adm-btn" onClick={()=>markPayoutPaid(p.id)} style={{ background:"#00dd5522", color:"#00dd55", border:"1px solid #00dd5533" }}>✓ MARK PAID</button>}
                 </div>
               </div>
             ))}
