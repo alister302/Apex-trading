@@ -172,6 +172,28 @@ function CandlePredict({ candle, dark }) {
   );
 }
 
+
+const TV_MAP = {
+  "R_10":   "DERIVDEX:VOLATILITY10INDEX",
+  "R_25":   "DERIVDEX:VOLATILITY25INDEX",
+  "R_50":   "DERIVDEX:VOLATILITY50INDEX",
+  "R_75":   "DERIVDEX:VOLATILITY75INDEX",
+  "R_100":  "DERIVDEX:VOLATILITY100INDEX",
+  "1HZ10V": "DERIVDEX:VOLATILITY10INDEX",
+  "1HZ25V": "DERIVDEX:VOLATILITY25INDEX",
+  "1HZ50V": "DERIVDEX:VOLATILITY50INDEX",
+  "1HZ75V": "DERIVDEX:VOLATILITY75INDEX",
+  "1HZ100V":"DERIVDEX:VOLATILITY100INDEX",
+  "frxEURUSD":"FX:EURUSD",
+  "frxGBPUSD":"FX:GBPUSD",
+  "frxUSDJPY":"FX:USDJPY",
+  "frxAUDUSD":"FX:AUDUSD",
+  "frxUSDCAD":"FX:USDCAD",
+  "frxEURGBP":"FX:EURGBP",
+};
+
+const TF_MAP = { 60:"1", 300:"5", 900:"15", 1800:"30", 3600:"60" };
+
 export default function DerivSignals({ dark }) {
   const [selectedPair, setSelectedPair] = useState(ALL_PAIRS[0]);
   const [timeframe, setTimeframe] = useState(TIMEFRAMES[0]);
@@ -184,6 +206,7 @@ export default function DerivSignals({ dark }) {
   const [soundOn, setSoundOn] = useState(true);
   const [autoScan, setAutoScan] = useState(false);
   const [lastSignal, setLastSignal] = useState(null);
+  const [showChart, setShowChart] = useState(true);
   const wsRef = useRef(null);
   const candlesRef = useRef([]);
   const autoRef = useRef(null);
@@ -382,6 +405,26 @@ export default function DerivSignals({ dark }) {
           </div>
         </div>
 
+
+        {/* TradingView Chart */}
+        {showChart && (
+          <div style={{ borderRadius:8, overflow:"hidden", marginBottom:10, border:`1px solid ${t.border}` }}>
+            <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>
+              📊 LIVE CHART · {selectedPair.name} · {timeframe.label}
+            </div>
+            <iframe
+              key={selectedPair.symbol + timeframe.value}
+              src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair.symbol]||"FX:EURUSD")}&interval=${TF_MAP[timeframe.value]||"1"}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
+              style={{ width:"100%", height:220, border:"none", display:"block" }}
+              title={selectedPair.name}
+              loading="lazy"
+            />
+          </div>
+        )}
+        <button className="dbtn" onClick={()=>setShowChart(!showChart)}
+          style={{ width:"100%", background:"transparent", border:`1px solid ${t.border}`, color:t.muted, padding:"6px", borderRadius:6, fontSize:9, marginBottom:10, letterSpacing:1 }}>
+          {showChart?"▲ HIDE CHART":"▼ SHOW CHART"}
+        </button>
         {error && (
           <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:8, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between" }}>
             <span style={{ fontSize:11, color:"#ff5577" }}>⚠ {error}</span>
