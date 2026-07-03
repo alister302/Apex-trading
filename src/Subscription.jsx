@@ -112,8 +112,24 @@ export default function Subscription({ user, sub, onSubscribed, dark }) {
       setStkSent(true);
       setPayState("sent");
       setCheckoutId(data.checkout_request_id);
-      setStatus("M-Pesa prompt sent! Enter your PIN.");
+      setStatus("✅ M-Pesa prompt sent! Enter your PIN on your phone.");
       startPolling(data.checkout_request_id);
+      // Also poll subscription directly every 8 seconds
+      let subPollCount = 0;
+      const subPoll = setInterval(async () => {
+        subPollCount++;
+        try {
+          const subRes = await fetch(`${SERVER}/subscription/${user.id}`);
+          const subData = await subRes.json();
+          if (subData?.active) {
+            clearInterval(subPoll);
+            setPayState("complete");
+            setStatus("✅ Payment confirmed! Activating your plan...");
+            setTimeout(() => onSubscribed(), 1500);
+          }
+        } catch(e) {}
+        if (subPollCount >= 24) clearInterval(subPoll); // stop after 3 min
+      }, 8000);
 
     } catch(e) {
       setError(e.name === "AbortError"

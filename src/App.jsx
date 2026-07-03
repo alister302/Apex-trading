@@ -104,8 +104,20 @@ export default function App() {
       const res = await fetch(`${SERVER}/subscription/${user.id}`);
       const data = await res.json();
       setSub(data);
+      return data;
     } catch(e) {}
   };
+
+  // Poll subscription every 15 seconds to catch M-Pesa callbacks
+  useEffect(() => {
+    if (!user) return;
+    const poll = setInterval(async () => {
+      const data = await checkSub();
+      // Stop polling once active
+      if (data?.active) clearInterval(poll);
+    }, 15000);
+    return () => clearInterval(poll);
+  }, [user]);
 
   const verifyPayment = async (trackId, orderId) => {
     try {
