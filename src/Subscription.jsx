@@ -239,6 +239,32 @@ export default function Subscription({ user, sub, onSubscribed, dark }) {
           </div>
         )}
 
+
+        {/* Verify payment button */}
+        <div style={{ marginTop:10, background:dark?"#0a1520":"#e8f4ff", border:`1px solid ${t.border}`, borderRadius:10, padding:"14px 16px", marginBottom:14 }}>
+          <div style={{ fontSize:10, color:t.muted, fontWeight:700, marginBottom:6 }}>PAID BUT APP STILL LOCKED?</div>
+          <div style={{ fontSize:9, color:t.dim, marginBottom:10 }}>Tap below to verify your M-Pesa payment and unlock instantly.</div>
+          <button className="pay-btn" onClick={async()=>{
+            setStatus("Checking your payment...");
+            try {
+              const r1 = await fetch(`${SERVER}/subscription/${user.id}`);
+              const d1 = await r1.json();
+              if (d1?.active) { setStatus("✅ Found! Unlocking..."); setTimeout(()=>onSubscribed(),1500); return; }
+              const r2 = await fetch(`${SERVER}/mpesa/verify-pending`, {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({ user_id:user.id })
+              });
+              const d2 = await r2.json();
+              if (d2?.activated) { setStatus("✅ Payment verified! Unlocking..."); setTimeout(()=>onSubscribed(),1500); }
+              else setStatus("No completed payment found. Contact support if charged.");
+            } catch(e) { setStatus("Error: "+e.message); }
+          }}
+            style={{ width:"100%", padding:"12px", background:"linear-gradient(135deg,#0066ff,#0044bb)", color:"#fff", borderRadius:8, fontSize:11, letterSpacing:1, cursor:"pointer", border:"none", fontFamily:"'IBM Plex Mono',monospace", fontWeight:700 }}>
+            🔍 VERIFY MY PAYMENT
+          </button>
+          {status && <div style={{ marginTop:8, fontSize:10, color:"#4499ff", textAlign:"center" }}>{status}</div>}
+        </div>
+
         {/* Plans + Form */}
         {!stkSent && payState === "idle" && (
           <>
