@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import PocketOptionAuto from "./PocketOptionAuto";
 import ExnessSignals from "./ExnessSignals";
+import DerivSignals from "./DerivSignals";
 
 const SERVER = "https://apex-server-09p7.onrender.com";
 
@@ -230,7 +231,7 @@ export default function LiveSignals({ dark }) {
 
         {/* Sub tabs */}
         <div style={{ display:"flex", gap:6, marginBottom:14, background:t.bgCard, borderRadius:10, padding:5, border:`1px solid ${t.border}` }}>
-          {[["auto","📡 AUTO"],["manual","🎯 SNIPER SCAN"],["po","🟢 OLYMP SIGNALS"],["exness","📊 EXNESS"]].map(([id,lb]) => (
+          {[["auto","📡 AUTO"],["manual","🎯 SNIPER SCAN"],["po","🟢 OLYMP SIGNALS"],["exness","📊 EXNESS"],["deriv","📈 DERIV"]].map(([id,lb]) => (
             <button key={id} className="btn" onClick={() => setActiveTab(id)}
               style={{ flex:1, padding:"10px", background:activeTab===id?"#0066ff":"transparent", color:activeTab===id?"#fff":t.textMuted, borderRadius:7, fontSize:11, letterSpacing:1 }}>
               {lb}
@@ -431,6 +432,7 @@ export default function LiveSignals({ dark }) {
         {/* ===== SNIPER MANUAL TAB ===== */}
         {activeTab==="po" && <PocketOptionAuto dark={dark} />}
         {activeTab==="exness" && <ExnessSignals dark={dark} />}
+        {activeTab==="deriv" && <DerivSignals dark={dark} />}
         {activeTab==="manual" && (
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
 
