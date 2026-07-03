@@ -418,7 +418,7 @@ export default function DerivSignals({ dark }) {
               <iframe
                 key={selectedPair.symbol + timeframe.value}
                 src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair.symbol]||"FX:EURUSD")}&interval=${TF_MAP[timeframe.value]||"1"}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
-                style={{ width:"100%", height:220, border:"none", display:"block" }}
+                style={{ width:"100%", height:320, border:"none", display:"block" }}
                 title={selectedPair.name}
                 loading="lazy"
               />
@@ -426,7 +426,7 @@ export default function DerivSignals({ dark }) {
               <iframe
                 key={selectedPair.symbol + timeframe.value}
                 src={`https://charts.deriv.com/?symbol=${selectedPair.symbol}&granularity=${timeframe.value}&chartType=candles&theme=${dark?"dark":"light"}`}
-                style={{ width:"100%", height:220, border:"none", display:"block" }}
+                style={{ width:"100%", height:320, border:"none", display:"block" }}
                 title={selectedPair.name}
                 loading="lazy"
               />
