@@ -207,7 +207,8 @@ function DerivChart({ candles, dark, pair, timeframe }) {
         <span style={{ fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>📊 {pair} · {timeframe}</span>
         <span style={{ fontSize:9, color:"#ffd700", fontFamily:"monospace", fontWeight:700 }}>● {current?.toFixed(dec)}</span>
       </div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}>
+      <div style={{ overflowX:"auto", overflowY:"hidden", cursor:"grab" }}>
+      <svg width={Math.max(600, display.length * 12)} height={H} viewBox={`0 0 ${Math.max(W, display.length * 12)} ${H}`} style={{ display:"block" }}>
         <rect x={PL} y={PT} width={chartW} height={chartH} fill={dark?"#050a0f":"#ffffff"}/>
         {grids.map((p,i)=>(
           <g key={i}>
@@ -236,6 +237,7 @@ function DerivChart({ candles, dark, pair, timeframe }) {
           </g>
         )}
       </svg>
+      </div>
     </div>
   );
 }
