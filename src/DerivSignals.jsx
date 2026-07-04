@@ -412,13 +412,24 @@ export default function DerivSignals({ dark }) {
             <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>
               📊 LIVE CHART · {selectedPair.name} · {timeframe.label}
             </div>
-            <iframe
+            {selectedPair.symbol.startsWith("frx") ? (
+              <iframe
                 key={selectedPair.symbol + timeframe.value}
-                src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair.symbol]||"FX:EURUSD")}&interval=${TF_MAP[timeframe.value]||"1"}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
+                src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair.symbol])}&interval=${TF_MAP[timeframe.value]||"1"}&theme=${dark?"dark":"light"}&style=1&locale=en&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
                 style={{ width:"100%", height:320, border:"none", display:"block" }}
                 title={selectedPair.name}
                 loading="lazy"
               />
+            ) : (
+              <iframe
+                key={selectedPair.symbol + timeframe.value}
+                src={`https://deriv.com/endpoint/?symbol=${selectedPair.symbol}&granularity=${timeframe.value}`}
+                style={{ width:"100%", height:320, border:"none", display:"block" }}
+                title={selectedPair.name}
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin allow-forms"
+              />
+            )}
           </div>
         )}
         <button className="dbtn" onClick={()=>setShowChart(!showChart)}
