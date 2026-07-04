@@ -569,7 +569,16 @@ export default function DerivSignals({ dark }) {
         
         {/* Live Candle Chart */}
         {showChart && (
-          <LiveCandleChart candles={candles} dark={dark} pair={selectedPair.symbol} tf={timeframe.label} />
+          <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${t.border}` }}>
+            <iframe
+              key={selectedPair.symbol + timeframe.value}
+              src={`https://app.deriv.com/dtrader#chart_type=Candles&interval=${timeframe.value}&symbol=${selectedPair.symbol}`}
+              style={{ width:"100%", height:320, border:"none", display:"block" }}
+              title={selectedPair.name}
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            />
+          </div>
         )}
         <button className="dbtn" onClick={()=>setShowChart(!showChart)}
           style={{ width:"100%", background:"transparent", border:`1px solid ${t.border}`, color:t.muted, padding:"5px", borderRadius:6, fontSize:9, marginBottom:8, letterSpacing:1 }}>
