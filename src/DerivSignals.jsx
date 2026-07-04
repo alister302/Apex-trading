@@ -475,10 +475,6 @@ export default function DerivSignals({ dark }) {
         </div>
 
 
-        {/* TradingView Chart */}
-        
-        {/* Live Candle Chart */}
-        
 
         {error && (
           <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:8, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between" }}>
