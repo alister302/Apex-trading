@@ -178,6 +178,68 @@ function CandlePredict({ candle, dark }) {
 
 
 
+
+function DerivChart({ candles, dark, pair, timeframe }) {
+  if (!candles || candles.length < 3) return (
+    <div style={{ height:300, background:dark?"#0a1520":"#f0f8ff", borderRadius:8, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
+      <div style={{ fontSize:24 }}>📊</div>
+      <div style={{ fontSize:11, color:dark?"#4499ff":"#0055aa", fontFamily:"monospace" }}>Waiting for candles... ({candles?.length||0})</div>
+    </div>
+  );
+
+  const W = 600, H = 280, PL = 58, PB = 20, PT = 10;
+  const chartW = W - PL;
+  const chartH = H - PB - PT;
+  const display = [...candles].slice(0, 60).reverse();
+  const maxP = Math.max(...display.map(c=>c.high));
+  const minP = Math.min(...display.map(c=>c.low));
+  const range = maxP - minP || 0.0001;
+  const cw = Math.max(3, chartW / display.length - 1);
+  const toY = p => PT + ((maxP - p) / range) * chartH;
+  const toX = i => PL + (i / display.length) * chartW + cw/2;
+  const dec = pair?.startsWith("frx") ? 5 : 2;
+  const grids = Array.from({length:5}, (_,i) => minP + (range/4)*i);
+  const current = candles[0]?.close;
+
+  return (
+    <div style={{ background:dark?"#050a0f":"#ffffff", borderRadius:8, overflow:"hidden" }}>
+      <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", display:"flex", justifyContent:"space-between" }}>
+        <span style={{ fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>📊 {pair} · {timeframe}</span>
+        <span style={{ fontSize:9, color:"#ffd700", fontFamily:"monospace", fontWeight:700 }}>● {current?.toFixed(dec)}</span>
+      </div>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:"block" }}>
+        <rect x={PL} y={PT} width={chartW} height={chartH} fill={dark?"#050a0f":"#ffffff"}/>
+        {grids.map((p,i)=>(
+          <g key={i}>
+            <line x1={PL} y1={toY(p)} x2={W} y2={toY(p)} stroke={dark?"#1e3040":"#e8f0f8"} strokeWidth="0.5" strokeDasharray="4,4"/>
+            <text x={PL-3} y={toY(p)+3} fontSize="7" fill={dark?"#445566":"#889aa8"} textAnchor="end">{p.toFixed(dec)}</text>
+          </g>
+        ))}
+        {display.map((c,i)=>{
+          const bull = c.close >= c.open;
+          const col = bull?"#00dd55":"#ff2244";
+          const x = toX(i);
+          const bTop = Math.min(toY(c.open), toY(c.close));
+          const bH = Math.max(1, Math.abs(toY(c.close)-toY(c.open)));
+          return (
+            <g key={i}>
+              <line x1={x} y1={toY(c.high)} x2={x} y2={toY(c.low)} stroke={col} strokeWidth="1"/>
+              <rect x={x-cw/2} y={bTop} width={cw} height={bH} fill={col} opacity="0.9"/>
+            </g>
+          );
+        })}
+        {current && (
+          <g>
+            <line x1={PL} y1={toY(current)} x2={W} y2={toY(current)} stroke="#ffd700" strokeWidth="1" strokeDasharray="5,3"/>
+            <rect x={W-60} y={toY(current)-8} width={60} height={16} fill="#ffd700" rx="3"/>
+            <text x={W-30} y={toY(current)+4} fontSize="8" fill="#000" textAnchor="middle" fontWeight="bold">{current.toFixed(dec)}</text>
+          </g>
+        )}
+      </svg>
+    </div>
+  );
+}
+
 export default function DerivSignals({ dark }) {
   const [selectedPair, setSelectedPair] = useState(ALL_PAIRS[0]);
   const [timeframe, setTimeframe] = useState(TIMEFRAMES[0]);
@@ -190,6 +252,7 @@ export default function DerivSignals({ dark }) {
   const [soundOn, setSoundOn] = useState(true);
   const [autoScan, setAutoScan] = useState(false);
   const [lastSignal, setLastSignal] = useState(null);
+  const [showChart, setShowChart] = useState(true);
   
   const wsRef = useRef(null);
   const candlesRef = useRef([]);
@@ -390,6 +453,15 @@ export default function DerivSignals({ dark }) {
         </div>
 
 
+
+        {/* Chart */}
+        <div style={{ marginBottom:10 }}>
+          <DerivChart candles={candles} dark={dark} pair={selectedPair.symbol} timeframe={timeframe.label} />
+          <button className="dbtn" onClick={()=>setShowChart(!showChart)}
+            style={{ width:"100%", background:"transparent", border:`1px solid ${t.border}`, color:t.muted, padding:"5px", borderRadius:6, fontSize:9, marginTop:4, letterSpacing:1 }}>
+            {showChart?"▲ HIDE CHART":"▼ SHOW CHART"}
+          </button>
+        </div>
 
         {error && (
           <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:8, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between" }}>
