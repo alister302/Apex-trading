@@ -174,18 +174,16 @@ function CandlePredict({ candle, dark }) {
 
 
 const TV_MAP = {
-  // Volatility indices - use Deriv's own TradingView symbols
-  "R_10":    "BINARY:R_10",
-  "R_25":    "BINARY:R_25",
-  "R_50":    "BINARY:R_50",
-  "R_75":    "BINARY:R_75",
-  "R_100":   "BINARY:R_100",
-  "1HZ10V":  "BINARY:1HZ10V",
-  "1HZ25V":  "BINARY:1HZ25V",
-  "1HZ50V":  "BINARY:1HZ50V",
-  "1HZ75V":  "BINARY:1HZ75V",
-  "1HZ100V": "BINARY:1HZ100V",
-  // Forex - standard TradingView symbols
+  "R_10":    "VOLATILITY10INDEX",
+  "R_25":    "VOLATILITY25INDEX",
+  "R_50":    "VOLATILITY50INDEX",
+  "R_75":    "VOLATILITY75INDEX",
+  "R_100":   "VOLATILITY100INDEX",
+  "1HZ10V":  "VOLATILITY10_1SINDEX",
+  "1HZ25V":  "VOLATILITY25_1SINDEX",
+  "1HZ50V":  "VOLATILITY50_1SINDEX",
+  "1HZ75V":  "VOLATILITY75_1SINDEX",
+  "1HZ100V": "VOLATILITY100_1SINDEX",
   "frxEURUSD":"FX:EURUSD",
   "frxGBPUSD":"FX:GBPUSD",
   "frxUSDJPY":"FX:USDJPY",
@@ -414,23 +412,13 @@ export default function DerivSignals({ dark }) {
             <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>
               📊 LIVE CHART · {selectedPair.name} · {timeframe.label}
             </div>
-            {selectedPair.symbol.startsWith("frx") ? (
-              <iframe
+            <iframe
                 key={selectedPair.symbol + timeframe.value}
                 src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair.symbol]||"FX:EURUSD")}&interval=${TF_MAP[timeframe.value]||"1"}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
                 style={{ width:"100%", height:320, border:"none", display:"block" }}
                 title={selectedPair.name}
                 loading="lazy"
               />
-            ) : (
-              <iframe
-                key={selectedPair.symbol + timeframe.value}
-                src={`https://charts.deriv.com/?symbol=${selectedPair.symbol}&granularity=${timeframe.value}&chartType=candles&theme=${dark?"dark":"light"}`}
-                style={{ width:"100%", height:320, border:"none", display:"block" }}
-                title={selectedPair.name}
-                loading="lazy"
-              />
-            )}
           </div>
         )}
         <button className="dbtn" onClick={()=>setShowChart(!showChart)}
