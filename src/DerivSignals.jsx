@@ -480,17 +480,7 @@ export default function DerivSignals({ dark }) {
             <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>
               📊 LIVE CHART · {selectedPair.name} · {timeframe.label}
             </div>
-            {selectedPair.symbol.startsWith("frx") ? (
-              <iframe
-                key={selectedPair.symbol + timeframe.value}
-                src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_MAP[selectedPair.symbol])}&interval=${TF_MAP[timeframe.value]||"1"}&theme=${dark?"dark":"light"}&style=1&locale=en&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
-                style={{ width:"100%", height:320, border:"none", display:"block" }}
-                title={selectedPair.name}
-                loading="lazy"
-              />
-            ) : (
-              <CandleChart candles={candles} dark={dark} height={320} />
-            )}
+            <CandleChart candles={candles} dark={dark} height={320} />
           </div>
         )}
         <button className="dbtn" onClick={()=>setShowChart(!showChart)}
