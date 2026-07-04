@@ -180,6 +180,12 @@ function CandlePredict({ candle, dark }) {
 
 
 function DerivChart({ candles, dark, pair, timeframe }) {
+  const [zoom, setZoom] = React.useState(1);
+  const [scrollLeft, setScrollLeft] = React.useState(0);
+  const containerRef = React.useRef(null);
+  const isDragging = React.useRef(false);
+  const lastX = React.useRef(0);
+
   if (!candles || candles.length < 3) return (
     <div style={{ height:300, background:dark?"#0a1520":"#f0f8ff", borderRadius:8, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8 }}>
       <div style={{ fontSize:24 }}>📊</div>
@@ -187,56 +193,137 @@ function DerivChart({ candles, dark, pair, timeframe }) {
     </div>
   );
 
-  const W = 600, H = 280, PL = 58, PB = 20, PT = 10;
-  const chartW = W - PL;
+  const H = 280, PL = 58, PB = 20, PT = 10;
   const chartH = H - PB - PT;
-  const display = [...candles].slice(0, 60).reverse();
+  const display = [...candles].slice(0, Math.min(100, candles.length)).reverse();
   const maxP = Math.max(...display.map(c=>c.high));
   const minP = Math.min(...display.map(c=>c.low));
   const range = maxP - minP || 0.0001;
-  const cw = Math.max(3, chartW / display.length - 1);
-  const toY = p => PT + ((maxP - p) / range) * chartH;
-  const toX = i => PL + (i / display.length) * chartW + cw/2;
   const dec = pair?.startsWith("frx") ? 5 : 2;
-  const grids = Array.from({length:5}, (_,i) => minP + (range/4)*i);
   const current = candles[0]?.close;
 
+  // Zoom controls candle width
+  const cw = Math.max(4, 10 * zoom);
+  const totalW = PL + display.length * (cw + 1) + 20;
+  const W = Math.max(600, totalW);
+  const chartW = W - PL;
+
+  const toY = p => PT + ((maxP - p) / range) * chartH;
+  const toX = i => PL + i * (cw + 1) + cw/2;
+
+  // Grid lines - horizontal and vertical
+  const hGrids = Array.from({length:6}, (_,i) => minP + (range/5)*i);
+  const vGridCount = Math.floor(display.length / 5);
+  const vGrids = Array.from({length:vGridCount}, (_,i) => i*5);
+
+  const handleWheel = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.15 : 0.15;
+    setZoom(z => Math.max(0.3, Math.min(5, z + delta)));
+  };
+
+  const handleMouseDown = (e) => { isDragging.current=true; lastX.current=e.clientX; };
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return;
+    const dx = lastX.current - e.clientX;
+    lastX.current = e.clientX;
+    if (containerRef.current) containerRef.current.scrollLeft += dx;
+  };
+  const handleMouseUp = () => { isDragging.current=false; };
+
+  const handleTouchStart = (e) => { lastX.current = e.touches[0].clientX; };
+  const handleTouchMove = (e) => {
+    e.stopPropagation();
+    const dx = lastX.current - e.touches[0].clientX;
+    lastX.current = e.touches[0].clientX;
+    if (containerRef.current) containerRef.current.scrollLeft += dx;
+  };
+
   return (
-    <div style={{ background:dark?"#050a0f":"#ffffff", borderRadius:8, overflow:"hidden" }}>
-      <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", display:"flex", justifyContent:"space-between" }}>
+    <div style={{ background:dark?"#050a0f":"#ffffff", borderRadius:8, overflow:"hidden", border:`1px solid ${dark?"#1e3040":"#d0dce8"}` }}>
+      
+      {/* Header */}
+      <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <span style={{ fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>📊 {pair} · {timeframe}</span>
-        <span style={{ fontSize:9, color:"#ffd700", fontFamily:"monospace", fontWeight:700 }}>● {current?.toFixed(dec)}</span>
+        <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+          <span style={{ fontSize:9, color:"#ffd700", fontFamily:"monospace", fontWeight:700 }}>● {current?.toFixed(dec)}</span>
+          <button onClick={()=>setZoom(z=>Math.min(5,z+0.3))} style={{ background:"#0066ff22", border:"1px solid #0066ff44", color:"#4499ff", fontSize:10, padding:"2px 7px", borderRadius:4, cursor:"pointer", fontFamily:"monospace" }}>+</button>
+          <button onClick={()=>setZoom(z=>Math.max(0.3,z-0.3))} style={{ background:"#0066ff22", border:"1px solid #0066ff44", color:"#4499ff", fontSize:10, padding:"2px 7px", borderRadius:4, cursor:"pointer", fontFamily:"monospace" }}>−</button>
+          <button onClick={()=>setZoom(1)} style={{ background:"#ffd70022", border:"1px solid #ffd70033", color:"#ffd700", fontSize:9, padding:"2px 7px", borderRadius:4, cursor:"pointer", fontFamily:"monospace" }}>↺</button>
+        </div>
       </div>
-      <div style={{ overflowX:"auto", overflowY:"hidden", cursor:"grab" }}>
-      <svg width={Math.max(600, display.length * 12)} height={H} viewBox={`0 0 ${Math.max(W, display.length * 12)} ${H}`} style={{ display:"block" }}>
-        <rect x={PL} y={PT} width={chartW} height={chartH} fill={dark?"#050a0f":"#ffffff"}/>
-        {grids.map((p,i)=>(
-          <g key={i}>
-            <line x1={PL} y1={toY(p)} x2={W} y2={toY(p)} stroke={dark?"#1e3040":"#e8f0f8"} strokeWidth="0.5" strokeDasharray="4,4"/>
-            <text x={PL-3} y={toY(p)+3} fontSize="7" fill={dark?"#445566":"#889aa8"} textAnchor="end">{p.toFixed(dec)}</text>
-          </g>
-        ))}
-        {display.map((c,i)=>{
-          const bull = c.close >= c.open;
-          const col = bull?"#00dd55":"#ff2244";
-          const x = toX(i);
-          const bTop = Math.min(toY(c.open), toY(c.close));
-          const bH = Math.max(1, Math.abs(toY(c.close)-toY(c.open)));
-          return (
-            <g key={i}>
-              <line x1={x} y1={toY(c.high)} x2={x} y2={toY(c.low)} stroke={col} strokeWidth="1"/>
-              <rect x={x-cw/2} y={bTop} width={cw} height={bH} fill={col} opacity="0.9"/>
+
+      {/* Scrollable chart area */}
+      <div
+        ref={containerRef}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        style={{ overflowX:"auto", overflowY:"hidden", cursor:"grab", touchAction:"pan-x" }}
+      >
+        <svg width={W} height={H} style={{ display:"block", minWidth:W }}>
+          
+          {/* Background */}
+          <rect x={PL} y={PT} width={chartW} height={chartH} fill={dark?"#050a0f":"#ffffff"}/>
+
+          {/* Vertical grid lines */}
+          {vGrids.map((gi,i)=>(
+            <line key={"vg"+i} x1={toX(gi)} y1={PT} x2={toX(gi)} y2={H-PB}
+              stroke={dark?"#1e304044":"#e0eaf488"} strokeWidth="0.5" strokeDasharray="3,4"/>
+          ))}
+
+          {/* Horizontal grid lines + price labels */}
+          {hGrids.map((p,i)=>(
+            <g key={"hg"+i}>
+              <line x1={PL} y1={toY(p)} x2={W} y2={toY(p)}
+                stroke={dark?"#1e3040":"#e0eaf4"} strokeWidth="0.5" strokeDasharray="4,4"/>
+              <text x={PL-4} y={toY(p)+3} fontSize="7" fill={dark?"#445566":"#889aa8"} textAnchor="end">
+                {p.toFixed(dec)}
+              </text>
             </g>
-          );
-        })}
-        {current && (
-          <g>
-            <line x1={PL} y1={toY(current)} x2={W} y2={toY(current)} stroke="#ffd700" strokeWidth="1" strokeDasharray="5,3"/>
-            <rect x={W-60} y={toY(current)-8} width={60} height={16} fill="#ffd700" rx="3"/>
-            <text x={W-30} y={toY(current)+4} fontSize="8" fill="#000" textAnchor="middle" fontWeight="bold">{current.toFixed(dec)}</text>
-          </g>
-        )}
-      </svg>
+          ))}
+
+          {/* Candles */}
+          {display.map((c,i)=>{
+            const bull = c.close >= c.open;
+            const col = bull?"#00dd55":"#ff2244";
+            const x = toX(i);
+            const bTop = Math.min(toY(c.open), toY(c.close));
+            const bH = Math.max(1.5, Math.abs(toY(c.close)-toY(c.open)));
+            return (
+              <g key={i}>
+                <line x1={x} y1={toY(c.high)} x2={x} y2={toY(c.low)} stroke={col} strokeWidth="1"/>
+                <rect x={x-cw/2} y={bTop} width={cw} height={bH} fill={bull?col:"#ff2244"} stroke={col} strokeWidth="0.5"/>
+              </g>
+            );
+          })}
+
+          {/* Current price line */}
+          {current && (
+            <g>
+              <line x1={PL} y1={toY(current)} x2={W} y2={toY(current)}
+                stroke="#ffd700" strokeWidth="1" strokeDasharray="5,3"/>
+              <rect x={W-62} y={toY(current)-8} width={62} height={16} fill="#ffd700" rx="3"/>
+              <text x={W-31} y={toY(current)+4} fontSize="8" fill="#000" textAnchor="middle" fontWeight="bold">
+                {current.toFixed(dec)}
+              </text>
+            </g>
+          )}
+
+          {/* Price axis border */}
+          <line x1={PL} y1={PT} x2={PL} y2={H-PB} stroke={dark?"#1e3040":"#d0dce8"} strokeWidth="1"/>
+        </svg>
+      </div>
+
+      {/* Footer hint */}
+      <div style={{ padding:"3px 10px", fontSize:8, color:dark?"#334455":"#889aa8", fontFamily:"monospace", display:"flex", justifyContent:"space-between" }}>
+        <span>← scroll to pan · pinch or +/− to zoom</span>
+        <span>{display.length} candles</span>
       </div>
     </div>
   );
