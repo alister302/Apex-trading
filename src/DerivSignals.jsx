@@ -194,6 +194,74 @@ const TV_MAP = {
 
 const TF_MAP = { 60:"1", 300:"5", 900:"15", 1800:"30", 3600:"60" };
 
+
+function CandleChart({ candles, dark, height=320 }) {
+    <div style={{ height, background:dark?"#0a1520":"#e8f4ff", display:"flex", alignItems:"center", justifyContent:"center", color:dark?"#445566":"#778899", fontFamily:"monospace", fontSize:11 }}>
+      Loading candles...
+    </div>
+  );
+
+  const display = candles.slice(0, 60).reverse();
+  const highs = display.map(c=>c.high);
+  const lows = display.map(c=>c.low);
+  const maxP = Math.max(...highs);
+  const minP = Math.min(...lows);
+  const range = maxP - minP || 1;
+  const pad = 40;
+  const w = 800;
+  const h = height - 20;
+  const chartW = w - pad;
+  const candleW = Math.max(2, (chartW / display.length) - 1);
+
+  const toY = price => pad/2 + ((maxP - price) / range) * (h - pad);
+  const toX = i => pad + i * (chartW / display.length) + candleW/2;
+
+  const priceLabels = [];
+  for (let i=0;i<=4;i++) priceLabels.push(minP + (range/4)*i);
+
+  return (
+    <div style={{ background:dark?"#0a1520":"#f0f8ff", borderRadius:6, overflow:"hidden" }}>
+      <svg width="100%" viewBox={`0 0 ${w} ${height}`} style={{ display:"block" }}>
+        {/* Grid lines */}
+        {priceLabels.map((p,i)=>(
+          <g key={i}>
+            <line x1={pad} y1={toY(p)} x2={w} y2={toY(p)} stroke={dark?"#1e3040":"#d0dce8"} strokeWidth="0.5" strokeDasharray="4,4" />
+            <text x={pad-4} y={toY(p)+4} fontSize="8" fill={dark?"#445566":"#778899"} textAnchor="end">{p.toFixed(2)}</text>
+          </g>
+        ))}
+
+        {/* Candles */}
+        {display.map((c,i)=>{
+          const bull = c.close >= c.open;
+          const color = bull ? "#00dd55" : "#ff2244";
+          const x = toX(i);
+          const openY = toY(c.open);
+          const closeY = toY(c.close);
+          const highY = toY(c.high);
+          const lowY = toY(c.low);
+          const bodyTop = Math.min(openY, closeY);
+          const bodyH = Math.max(1, Math.abs(closeY - openY));
+          return (
+            <g key={i}>
+              <line x1={x} y1={highY} x2={x} y2={lowY} stroke={color} strokeWidth="1" />
+              <rect x={x - candleW/2} y={bodyTop} width={candleW} height={bodyH} fill={color} opacity="0.9" />
+            </g>
+          );
+        })}
+
+        {/* Current price line */}
+        {candles[0] && (
+          <g>
+            <line x1={pad} y1={toY(candles[0].close)} x2={w} y2={toY(candles[0].close)} stroke="#ffd700" strokeWidth="1" strokeDasharray="6,3" />
+            <rect x={w-52} y={toY(candles[0].close)-8} width={52} height={16} fill="#ffd700" rx="3" />
+            <text x={w-26} y={toY(candles[0].close)+5} fontSize="8" fill="#000" textAnchor="middle" fontWeight="bold">{candles[0].close.toFixed(2)}</text>
+          </g>
+        )}
+      </svg>
+    </div>
+  );
+}
+
 export default function DerivSignals({ dark }) {
   const [selectedPair, setSelectedPair] = useState(ALL_PAIRS[0]);
   const [timeframe, setTimeframe] = useState(TIMEFRAMES[0]);
@@ -421,14 +489,7 @@ export default function DerivSignals({ dark }) {
                 loading="lazy"
               />
             ) : (
-              <iframe
-                key={selectedPair.symbol + timeframe.value}
-                src={`https://deriv.com/endpoint/?symbol=${selectedPair.symbol}&granularity=${timeframe.value}`}
-                style={{ width:"100%", height:320, border:"none", display:"block" }}
-                title={selectedPair.name}
-                loading="lazy"
-                sandbox="allow-scripts allow-same-origin allow-forms"
-              />
+              <CandleChart candles={candles} dark={dark} height={320} />
             )}
           </div>
         )}
