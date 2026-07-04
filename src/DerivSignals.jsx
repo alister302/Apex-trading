@@ -518,6 +518,10 @@ export default function DerivSignals({ dark }) {
             style={{ flex:1, padding:"14px", background:"transparent", border:`1px solid ${t.border}`, color:t.muted, borderRadius:10, fontSize:11 }}>
             ⟳ RECONNECT
           </button>
+          <button className="dbtn" onClick={()=>fetchCandles(wsRef.current)}
+            style={{ flex:1, padding:"14px", background:"transparent", border:`1px solid ${t.border}`, color:"#ffd700", borderRadius:10, fontSize:11 }}>
+            📊 RELOAD CHART
+          </button>
         </div>
 
         {/* Analysis result */}
