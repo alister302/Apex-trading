@@ -364,7 +364,6 @@ export default function DerivSignals({ dark }) {
   const [soundOn, setSoundOn] = useState(true);
   const [autoScan, setAutoScan] = useState(false);
   const [lastSignal, setLastSignal] = useState(null);
-  const [showChart, setShowChart] = useState(true);
   
   const wsRef = useRef(null);
   const candlesRef = useRef([]);
@@ -568,22 +567,7 @@ export default function DerivSignals({ dark }) {
         {/* TradingView Chart */}
         
         {/* Live Candle Chart */}
-        {showChart && (
-          <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${t.border}` }}>
-            <iframe
-              key={selectedPair.symbol + timeframe.value}
-              src={`https://app.deriv.com/dtrader#chart_type=Candles&interval=${timeframe.value}&symbol=${selectedPair.symbol}`}
-              style={{ width:"100%", height:320, border:"none", display:"block" }}
-              title={selectedPair.name}
-              loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            />
-          </div>
-        )}
-        <button className="dbtn" onClick={()=>setShowChart(!showChart)}
-          style={{ width:"100%", background:"transparent", border:`1px solid ${t.border}`, color:t.muted, padding:"5px", borderRadius:6, fontSize:9, marginBottom:8, letterSpacing:1 }}>
-          {showChart?"▲ HIDE CHART":"▼ SHOW CHART"}
-        </button>
+        
 
         {error && (
           <div style={{ background:dark?"#1a0005":"#fff0f3", border:"1px solid #ff224433", borderRadius:8, padding:"10px 14px", marginBottom:12, display:"flex", justifyContent:"space-between" }}>
