@@ -364,7 +364,7 @@ export default function App() {
       <div style={{flex:1,overflowY:"auto",overflowX:"hidden"}}>
 
         {showSub && (
-          <Subscription user={user} sub={sub} onSubscribed={async()=>{await checkSub();setShowSub(false);}} dark={dark} />
+          <Subscription user={user} sub={sub} onSubscribed={async()=>{ await checkSub(); await checkSub(); setShowSub(false); setSub(prev => ({...prev, active:true})); }} dark={dark} />
         )}
 
         {!showSub && <>

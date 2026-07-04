@@ -58,8 +58,8 @@ export default function Subscription({ user, sub, onSubscribed, dark }) {
         if (data.state === "COMPLETE") {
           clearInterval(pollRef.current);
           setPayState("complete");
-          setStatus("✅ Payment confirmed!");
-          setTimeout(() => onSubscribed(), 2500);
+          setStatus("✅ Payment confirmed! Unlocking your account...");
+          setTimeout(() => onSubscribed(), 1000);
         } else if (data.state === "CANCELLED" || data.state === "FAILED") {
           clearInterval(pollRef.current);
           setPayState("failed");
