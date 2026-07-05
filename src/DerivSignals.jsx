@@ -147,11 +147,14 @@ function playAlert(signal) {
 }
 
 // ── Candle Chart ─────────────────────────────────────────
-function DerivChart({ candles, dark, pair, tf }) {
+function DerivChart({ candles, dark, pair, tf, rsi }) {
   const containerRef = useRef(null);
   const [zoom, setZoom] = useState(1);
   const dragging = useRef(false);
   const lastX = useRef(0);
+  const prevClose = candles?.[1]?.close;
+  const current = candles?.[0]?.close;
+  const priceUp = current >= (prevClose || current);
 
   if (!candles || candles.length < 3) return (
     <div style={{ height:280, background:dark?"#0a1520":"#f0f8ff", borderRadius:8,
@@ -163,22 +166,36 @@ function DerivChart({ candles, dark, pair, tf }) {
     </div>
   );
 
-  const H = 280, PL = 58, PB = 22, PT = 10;
+  const H = 300, AXIS_W = 68, PB = 24, PT = 10;
   const chartH = H - PB - PT;
   const display = [...candles].slice(0, 80).reverse();
+  const dec = pair?.startsWith("frx") ? 5 : 2;
+  const cw  = Math.max(4, 10 * zoom);
+  const CANDLE_AREA_W = Math.max(540, display.length * (cw + 1) + 20);
+  const W = CANDLE_AREA_W + AXIS_W;
+
+  // Price range with padding
   const maxP = Math.max(...display.map(c => c.high));
   const minP = Math.min(...display.map(c => c.low));
-  const range = maxP - minP || 0.0001;
-  const dec   = pair?.startsWith("frx") ? 5 : 2;
-  const cw    = Math.max(4, 10 * zoom);
-  const W     = Math.max(600, PL + display.length * (cw + 1) + 30);
-  const chartW = W - PL;
-  const toY = p  => PT + ((maxP - p) / range) * chartH;
-  const toX = i  => PL + i * (cw + 1) + cw / 2;
-  const current  = candles[0]?.close;
-  const hGrids   = Array.from({ length:6 }, (_, i) => minP + (range / 5) * i);
-  const vStep    = Math.max(1, Math.floor(display.length / 8));
-  const vGrids   = Array.from({ length: Math.floor(display.length / vStep) }, (_, i) => i * vStep);
+  const pad  = (maxP - minP) * 0.05;
+  const hi   = maxP + pad, lo = minP - pad;
+  const range = hi - lo || 0.0001;
+
+  const toY = p  => PT + ((hi - p) / range) * chartH;
+  const toX = i  => i * (cw + 1) + cw / 2;
+
+  // Even price grid — interval based not candle based
+  const gridCount = 6;
+  const rawStep = range / gridCount;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const niceStep = Math.ceil(rawStep / magnitude) * magnitude;
+  const firstGrid = Math.ceil(lo / niceStep) * niceStep;
+  const hGrids = [];
+  for (let p = firstGrid; p <= hi; p += niceStep) hGrids.push(parseFloat(p.toFixed(dec)));
+
+  // Vertical time grids
+  const vStep = Math.max(5, Math.floor(display.length / 8));
+  const vGrids = Array.from({ length: Math.floor(display.length / vStep) }, (_, i) => i * vStep);
 
   const onWheel = e => { e.stopPropagation(); e.preventDefault();
     setZoom(z => Math.max(0.3, Math.min(6, z + (e.deltaY < 0 ? 0.2 : -0.2)))); };
@@ -192,6 +209,9 @@ function DerivChart({ candles, dark, pair, tf }) {
     if (containerRef.current) containerRef.current.scrollLeft += lastX.current - e.touches[0].clientX;
     lastX.current = e.touches[0].clientX; };
 
+  const priceColor = priceUp ? "#00cc88" : "#ff2244";
+  const badgeW = dec >= 5 ? 64 : 52;
+
   return (
     <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${dark?"#1e3040":"#d0dce8"}`, marginBottom:10 }}>
       {/* Header */}
@@ -201,9 +221,6 @@ function DerivChart({ candles, dark, pair, tf }) {
           📊 {pair} · {tf}
         </span>
         <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-          <span style={{ fontSize:9, color:"#ffd700", fontFamily:"monospace", fontWeight:700 }}>
-            ● {current?.toFixed(dec)}
-          </span>
           {[["−", () => setZoom(z => Math.max(0.3, z - 0.3))],
             ["+", () => setZoom(z => Math.min(6, z + 0.3))],
             ["↺", () => setZoom(1)]].map(([lbl, fn]) => (
@@ -214,61 +231,87 @@ function DerivChart({ candles, dark, pair, tf }) {
         </div>
       </div>
 
-      {/* Chart */}
-      <div ref={containerRef} onWheel={onWheel}
-        onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}
-        onTouchStart={onTS} onTouchMove={onTM}
-        style={{ overflowX:"auto", overflowY:"hidden", cursor:"grab", touchAction:"pan-x",
-          background:dark?"#050a0f":"#ffffff" }}>
-        <svg width={W} height={H} style={{ display:"block" }}>
-          <rect x={PL} y={PT} width={chartW} height={chartH} fill={dark?"#050a0f":"#ffffff"}/>
+      {/* Chart area — scrollable candles + fixed axis */}
+      <div style={{ display:"flex", background:dark?"#050a0f":"#ffffff", position:"relative" }}>
 
-          {/* Vertical grid */}
-          {vGrids.map((gi, i) => (
-            <line key={"v"+i} x1={toX(gi)} y1={PT} x2={toX(gi)} y2={H-PB}
-              stroke={dark?"#1e304055":"#e0eaf499"} strokeWidth="0.5" strokeDasharray="3,4"/>
-          ))}
+        {/* Scrollable candle area */}
+        <div ref={containerRef} onWheel={onWheel}
+          onMouseDown={onMD} onMouseMove={onMM} onMouseUp={onMU} onMouseLeave={onMU}
+          onTouchStart={onTS} onTouchMove={onTM}
+          style={{ flex:1, overflowX:"auto", overflowY:"hidden", cursor:"grab", touchAction:"pan-x" }}>
+          <svg width={CANDLE_AREA_W} height={H} style={{ display:"block" }}>
+            <rect x={0} y={PT} width={CANDLE_AREA_W} height={chartH} fill={dark?"#050a0f":"#ffffff"}/>
 
-          {/* Horizontal grid + labels */}
+            {/* Vertical time grid */}
+            {vGrids.map((gi, i) => (
+              <line key={"v"+i} x1={toX(gi)} y1={PT} x2={toX(gi)} y2={H-PB}
+                stroke={dark?"#1e304044":"#e0eaf466"} strokeWidth="0.5" strokeDasharray="3,4"/>
+            ))}
+
+            {/* Horizontal price grid */}
+            {hGrids.map((p, i) => (
+              <line key={"h"+i} x1={0} y1={toY(p)} x2={CANDLE_AREA_W} y2={toY(p)}
+                stroke={dark?"#1e3040":"#e8f0f8"} strokeWidth="0.5" strokeDasharray="4,4"/>
+            ))}
+
+            {/* Current price dotted guide */}
+            {current && (
+              <line x1={0} y1={toY(current)} x2={CANDLE_AREA_W} y2={toY(current)}
+                stroke={dark?"#33445566":"#99aabb55"} strokeWidth="1" strokeDasharray="4,4"/>
+            )}
+
+            {/* Candles */}
+            {display.map((c, i) => {
+              const bull = c.close >= c.open;
+              const col  = bull ? "#00dd55" : "#ff2244";
+              const x    = toX(i);
+              const bTop = Math.min(toY(c.open), toY(c.close));
+              const bH   = Math.max(1.5, Math.abs(toY(c.close) - toY(c.open)));
+              return (
+                <g key={i}>
+                  <line x1={x} y1={toY(c.high)} x2={x} y2={toY(c.low)} stroke={col} strokeWidth="1"/>
+                  <rect x={x-cw/2} y={bTop} width={cw} height={bH} fill={col}/>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* Fixed price axis on right */}
+        <svg width={AXIS_W} height={H} style={{ display:"block", flexShrink:0, background:dark?"#050a0f":"#ffffff" }}>
+          {/* Axis border */}
+          <line x1={0} y1={PT} x2={0} y2={H-PB} stroke={dark?"#1e3040":"#d0dce8"} strokeWidth="1"/>
+
+          {/* Price labels — evenly spaced */}
           {hGrids.map((p, i) => (
-            <g key={"h"+i}>
-              <line x1={PL} y1={toY(p)} x2={W} y2={toY(p)}
-                stroke={dark?"#1e3040":"#e0eaf4"} strokeWidth="0.5" strokeDasharray="4,4"/>
-              <text x={PL-4} y={toY(p)+3} fontSize="7" fill={dark?"#445566":"#889aa8"} textAnchor="end">
-                {p.toFixed(dec)}
-              </text>
-            </g>
+            <text key={i} x={6} y={toY(p)+3} fontSize="7.5"
+              fill={dark?"#667788":"#889aa8"} fontFamily="monospace">
+              {p.toFixed(dec)}
+            </text>
           ))}
 
-          {/* Candles */}
-          {display.map((c, i) => {
-            const bull = c.close >= c.open;
-            const col  = bull ? "#00dd55" : "#ff2244";
-            const x    = toX(i);
-            const bTop = Math.min(toY(c.open), toY(c.close));
-            const bH   = Math.max(1.5, Math.abs(toY(c.close) - toY(c.open)));
-            return (
-              <g key={i}>
-                <line x1={x} y1={toY(c.high)} x2={x} y2={toY(c.low)} stroke={col} strokeWidth="1"/>
-                <rect x={x-cw/2} y={bTop} width={cw} height={bH} fill={col} strokeWidth="0.5"/>
-              </g>
-            );
-          })}
-
-          {/* Current price */}
+          {/* Current price badge */}
           {current && (
             <g>
-              <line x1={PL} y1={toY(current)} x2={W} y2={toY(current)}
-                stroke="#ffd700" strokeWidth="1" strokeDasharray="5,3"/>
-              <rect x={W-65} y={toY(current)-9} width={65} height={17} fill="#ffd700" rx="3"/>
-              <text x={W-32} y={toY(current)+4} fontSize="8" fill="#000" textAnchor="middle" fontWeight="bold">
+              <rect x={1} y={toY(current)-9} width={AXIS_W-2} height={17}
+                fill={priceColor} rx="3"/>
+              <text x={(AXIS_W)/2} y={toY(current)+4} fontSize="8" fill="#fff"
+                textAnchor="middle" fontWeight="bold" fontFamily="monospace">
                 {current.toFixed(dec)}
               </text>
             </g>
           )}
 
-          {/* Y axis line */}
-          <line x1={PL} y1={PT} x2={PL} y2={H-PB} stroke={dark?"#1e3040":"#d0dce8"} strokeWidth="1"/>
+          {/* RSI badge at bottom */}
+          {rsi && (
+            <g>
+              <rect x={4} y={H-PB+4} width={AXIS_W-8} height={14} fill="#00888844" rx="3"/>
+              <text x={AXIS_W/2} y={H-PB+14} fontSize="7.5" fill="#00ccaa"
+                textAnchor="middle" fontFamily="monospace" fontWeight="bold">
+                RSI {rsi}
+              </text>
+            </g>
+          )}
         </svg>
       </div>
 
@@ -277,7 +320,7 @@ function DerivChart({ candles, dark, pair, tf }) {
         fontFamily:"monospace", display:"flex", justifyContent:"space-between",
         background:dark?"#050a0f":"#f8fbff" }}>
         <span>drag to pan · scroll or +/− to zoom</span>
-        <span>{display.length} candles</span>
+        <span>{display.length} candles · {priceUp?"▲":"▼"} {current?.toFixed(dec)}</span>
       </div>
     </div>
   );
@@ -510,7 +553,7 @@ export default function DerivSignals({ dark }) {
         </div>
 
         {/* Chart */}
-        <DerivChart candles={candles} dark={dark} pair={selectedPair.symbol} tf={timeframe.label} />
+        <DerivChart candles={candles} dark={dark} pair={selectedPair.symbol} tf={timeframe.label} rsi={analysis?.rsi} />
 
         {/* Error */}
         {error && (
