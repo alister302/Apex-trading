@@ -207,6 +207,7 @@ export default function App() {
 
   const TABS = [
     {id:"analyzer",label:"⚡ ANALYZER",premium:false},
+    {id:"partner",label:"💼 PARTNER",premium:false},
     {id:"iq",label:"🎓 IQ",premium:false},
     {id:"quiz",label:"🧩 QUIZ",premium:false},
     {id:"fast",label:"⚡ FAST",premium:true},
@@ -376,6 +377,32 @@ export default function App() {
           {tab==="risk" && <RiskCalc dark={dark} />}
           {tab==="live" && <LiveSignals dark={dark} isPremium={true} isAdmin={true} />}
 
+          {tab==="partner" && <div style={{padding:20,fontFamily:"'IBM Plex Mono',monospace",color:dark?"#c8d8e8":"#1a2a3a"}}>
+            <div style={{fontFamily:"'Orbitron',sans-serif",fontSize:18,fontWeight:900,color:"#ffd700",marginBottom:8}}>💼 PARTNER PROGRAM</div>
+            <div style={{fontSize:11,color:dark?"#8899aa":"#445566",marginBottom:20}}>Earn commissions by referring traders to PrinceX IQ</div>
+            <button onClick={()=>setShowInfluencer(true)} style={{width:"100%",padding:"16px",background:"linear-gradient(135deg,#ffd700,#cc9900)",color:"#000",border:"none",borderRadius:10,fontSize:14,fontWeight:900,cursor:"pointer",fontFamily:"'IBM Plex Mono',monospace",letterSpacing:2}}>
+              💼 JOIN PARTNER PROGRAM
+            </button>
+            <div style={{marginTop:20,background:dark?"#0a1520":"#e8f4ff",border:"1px solid #0066ff33",borderRadius:10,padding:"14px 16px"}}>
+              <div style={{fontSize:10,color:"#4499ff",fontWeight:700,marginBottom:10}}>HOW IT WORKS</div>
+              {[["1","Sign up as a partner below"],["2","Get your unique referral link"],["3","Share with traders on WhatsApp, TikTok, Instagram"],["4","Earn KES 100-1,200 per subscription"],["5","Request M-Pesa payout at KES 1,000+"]].map(([n,s])=>(
+                <div key={n} style={{display:"flex",gap:10,marginBottom:8,alignItems:"center"}}>
+                  <div style={{width:22,height:22,borderRadius:"50%",background:"#ffd70022",border:"1px solid #ffd70044",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    <span style={{fontSize:9,color:"#ffd700",fontWeight:900}}>{n}</span>
+                  </div>
+                  <span style={{fontSize:10,color:dark?"#8899aa":"#445566"}}>{s}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{marginTop:14,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+              {[["Weekly","KES 100"],["Monthly","KES 250"],["Annual","KES 1,200"]].map(([p,c])=>(
+                <div key={p} style={{background:dark?"#0a1520":"#f0f8ff",border:"1px solid #ffd70033",borderRadius:8,padding:"10px",textAlign:"center"}}>
+                  <div style={{fontSize:9,color:dark?"#667788":"#556677"}}>{p}</div>
+                  <div style={{fontFamily:"'Orbitron',sans-serif",fontSize:14,fontWeight:900,color:"#ffd700"}}>{c}</div>
+                </div>
+              ))}
+            </div>
+          </div>}
           {tab==="analyzer" && (
             <div style={{maxWidth:1100,margin:"0 auto",width:"100%",padding:"14px",display:"grid",gridTemplateColumns:"1fr 260px",gap:14}}>
               <div style={{display:"flex",flexDirection:"column",gap:12}}>
