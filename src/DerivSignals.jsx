@@ -487,11 +487,21 @@ export default function DerivSignals({ dark }) {
     if (candlesRef.current.length<30) { setError("Need 30+ candles — wait a moment"); return; }
     setLoading(true); setError("");
     try {
-      const sym=encodeURIComponent(selectedPair.symbol);
-      const res=await fetch(`${SERVER}/mega/signal/${sym}?tf=${timeframe.tf}`, { signal:AbortSignal.timeout(60000) });
-      const ct=res.headers.get("content-type")||"";
+      // Send WebSocket candles directly to server - no TwelveData needed
+      const res = await fetch(`${SERVER}/mega/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          candles: candlesRef.current,
+          htfCandles: [],
+          symbol: selectedPair.symbol,
+          tf: timeframe.tf,
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const ct = res.headers.get("content-type")||"";
       if (!ct.includes("json")) { setError("Server starting up — wait 30s and retry"); setLoading(false); return; }
-      const data=await res.json();
+      const data = await res.json();
       if (data.error) { setError(data.error); setLoading(false); return; }
       setAnalysis(data);
       if (data.signal!=="WAIT"&&soundOn) playAlert(data.tier);
