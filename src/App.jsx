@@ -207,7 +207,6 @@ export default function App() {
 
   const TABS = [
     {id:"analyzer",label:"⚡ ANALYZER",premium:false},
-    {id:"partner",label:"💼 PARTNER",premium:false},
     {id:"iq",label:"🎓 IQ",premium:false},
     {id:"quiz",label:"🧩 QUIZ",premium:false},
     {id:"fast",label:"⚡ FAST",premium:true},
@@ -215,6 +214,7 @@ export default function App() {
     {id:"elite",label:"★ ELITE",premium:true},
     {id:"risk",label:"🧮 RISK",premium:false},
     {id:"live",label:"📡 LIVE",premium:false},
+    {id:"partner",label:"💼 PARTNER",premium:false},
   ];
 
   if (splash) return <Splash onDone={() => setSplash(false)} />;
