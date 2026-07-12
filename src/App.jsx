@@ -95,8 +95,19 @@ export default function App() {
   const saveReferral = async (userId) => {
     const ref = localStorage.getItem('princex_ref');
     if (!ref) return;
-    await supabase.from('profiles').update({ referred_by: ref }).eq('id', userId);
-    localStorage.removeItem('princex_ref');
+    try {
+      // Save to profile and notify server to track signup
+      await supabase.from('profiles').update({ referred_by: ref }).eq('id', userId);
+      await fetch(SERVER + '/referral/track-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, ref_code: ref }),
+      });
+      localStorage.removeItem('princex_ref');
+      console.log('Referral tracked:', ref);
+    } catch(e) {
+      console.log('Referral track failed:', e.message);
+    }
   };
 
   const checkSub = async () => {
