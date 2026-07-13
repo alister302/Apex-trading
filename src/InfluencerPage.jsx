@@ -39,6 +39,10 @@ export default function InfluencerPage({ user, supabase, dark, onClose }) {
         setBalance(data.balance||0);
         setTotalEarned(data.totalEarned||0);
         setView("dashboard");
+        // Force refresh influencer object with latest counts
+        if (data.stats) {
+          setInfluencer(prev => ({...prev, ...data.influencer, total_referrals: data.stats.total}));
+        }
       } else setView("register");
     } catch(e) { setView("register"); }
   };
@@ -167,11 +171,12 @@ export default function InfluencerPage({ user, supabase, dark, onClose }) {
               {/* Overview */}
               {activeTab==="overview" && (
                 <div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:14 }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:10, marginBottom:14 }}>
                     {[
                       {l:"TOTAL EARNED",v:`KES ${totalEarned.toLocaleString()}`,c:"#ffd700"},
                       {l:"BALANCE",v:`KES ${balance.toLocaleString()}`,c:"#00dd55"},
-                      {l:"REFERRALS",v:influencer.total_referrals||0,c:"#4499ff"},
+                      {l:"SIGNUPS",v:referrals.filter(r=>r.status==="registered"||r.event==="signup").length,c:"#4499ff"},
+                      {l:"PAID SUBS",v:referrals.filter(r=>r.commission>0).length,c:"#00dd55"},
                     ].map(({l,v,c})=>(
                       <div key={l} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"12px 10px", textAlign:"center" }}>
                         <div style={{ fontSize:7, color:t.dim, letterSpacing:1, marginBottom:4 }}>{l}</div>
