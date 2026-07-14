@@ -18,7 +18,13 @@ export default function Auth({ onLogin }) {
     if (!name.trim() || !email.trim() || !password.trim()) { setError("All fields are required"); return; }
     if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
     setLoading(true); reset();
-    const { error: e } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { full_name: name.trim() } } });
+    const refCode = localStorage.getItem('princex_ref') || null;
+    const { error: e } = await supabase.auth.signUp({ 
+      email: email.trim(), 
+      password, 
+      options: { data: { full_name: name.trim(), ref_code: refCode } } 
+    });
+    if (!e && refCode) localStorage.removeItem('princex_ref');
     setLoading(false);
     if (e) setError(e.message);
     else { setSuccess("Account created! You can now sign in.");
