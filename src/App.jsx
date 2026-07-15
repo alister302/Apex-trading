@@ -55,6 +55,16 @@ export default function App() {
   const [showInfluencer, setShowInfluencer] = useState(false);
   const fileRef = useRef();
 
+  // Save ref code on page load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("princex_ref", ref.toUpperCase());
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setUser(data?.session?.user || null);
@@ -94,9 +104,22 @@ export default function App() {
 
   const saveReferral = async (userId) => {
     const ref = localStorage.getItem('princex_ref');
-    if (!ref) return;
+    if (!ref) {
+      // Check if profile already has referred_by from Supabase trigger
+      try {
+        const { data: profile } = await supabase.from('profiles').select('referred_by').eq('id', userId).single();
+        if (profile?.referred_by) {
+          // Already tracked via Supabase trigger - just sync with server
+          await fetch(SERVER + '/referral/track-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, ref_code: profile.referred_by }),
+          });
+        }
+      } catch(e) {}
+      return;
+    }
     try {
-      // Save to profile and notify server to track signup
       await supabase.from('profiles').update({ referred_by: ref }).eq('id', userId);
       await fetch(SERVER + '/referral/track-signup', {
         method: 'POST',
@@ -104,10 +127,7 @@ export default function App() {
         body: JSON.stringify({ user_id: userId, ref_code: ref }),
       });
       localStorage.removeItem('princex_ref');
-      console.log('Referral tracked:', ref);
-    } catch(e) {
-      console.log('Referral track failed:', e.message);
-    }
+    } catch(e) { console.log('Referral failed:', e.message); }
   };
 
   const checkSub = async () => {
