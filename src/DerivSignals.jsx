@@ -357,6 +357,40 @@ function SignalCard({ analysis, onClose }) {
         ))}
       </div>
 
+      {/* AI Reasoning */}
+      {analysis.reasoning && (
+        <div style={{ background:"#0a0520", border:"1px solid #8844ff33", borderRadius:8, padding:"10px 12px", marginBottom:12 }}>
+          <div style={{ fontSize:8, color:"#8844ff", fontWeight:700, letterSpacing:1, marginBottom:5 }}>🤖 GEMINI AI REASONING</div>
+          <div style={{ fontSize:10, color:"#c8d8e8", lineHeight:1.7, fontFamily:"monospace" }}>{analysis.reasoning}</div>
+          {analysis.market_context && <div style={{ fontSize:9, color:"#8899aa", marginTop:6, fontStyle:"italic" }}>{analysis.market_context}</div>}
+        </div>
+      )}
+
+      {/* Key level + entry quality */}
+      {(analysis.key_level || analysis.entry_quality) && (
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:12 }}>
+          {analysis.key_level && (
+            <div style={{ background:"#0a1520", borderRadius:6, padding:"8px 10px" }}>
+              <div style={{ fontSize:8, color:"#445566" }}>KEY LEVEL</div>
+              <div style={{ fontSize:11, color:"#ffd700", fontWeight:700, fontFamily:"monospace" }}>{analysis.key_level}</div>
+            </div>
+          )}
+          {analysis.entry_quality && (
+            <div style={{ background:"#0a1520", borderRadius:6, padding:"8px 10px" }}>
+              <div style={{ fontSize:8, color:"#445566" }}>ENTRY QUALITY</div>
+              <div style={{ fontSize:11, color:analysis.entry_quality==="EXCELLENT"?"#00dd55":analysis.entry_quality==="GOOD"?"#00aaff":"#ffaa00", fontWeight:700 }}>{analysis.entry_quality}</div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Risk warning */}
+      {analysis.risk_warning && (
+        <div style={{ background:"#1a1000", border:"1px solid #ffaa0033", borderRadius:6, padding:"8px 12px", marginBottom:12, fontSize:9, color:"#ffaa00", fontFamily:"monospace" }}>
+          ⚠️ {analysis.risk_warning}
+        </div>
+      )}
+
       {/* Entry/Exit */}
       <div style={{ background:"#0a1520", borderRadius:8, padding:"10px 12px", marginBottom:12 }}>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
@@ -484,29 +518,44 @@ export default function DerivSignals({ dark }) {
   }, [autoScan]);
 
   const getSignal = async () => {
-    if (candlesRef.current.length<30) { setError("Need 30+ candles — wait a moment"); return; }
+    if (candlesRef.current.length<10) { setError("Need more candles — wait a moment"); return; }
     setLoading(true); setError("");
     try {
-      // Send WebSocket candles directly to server - no TwelveData needed
-      const res = await fetch(`${SERVER}/mega/analyze`, {
+      const res = await fetch(`${SERVER}/ai/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           candles: candlesRef.current,
-          htfCandles: [],
           symbol: selectedPair.symbol,
-          tf: timeframe.tf,
+          tf: timeframe.label,
         }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(45000),
       });
       const ct = res.headers.get("content-type")||"";
       if (!ct.includes("json")) { setError("Server starting up — wait 30s and retry"); setLoading(false); return; }
       const data = await res.json();
       if (data.error) { setError(data.error); setLoading(false); return; }
+      // Map next5candles to predictions format
+      data.predictions = (data.next5candles||[]).map(c=>({
+        n:c.n, direction:c.direction, confidence:c.confidence,
+        rise:c.direction==="UP"?c.confidence:100-c.confidence,
+        fall:c.direction==="DOWN"?c.confidence:100-c.confidence,
+        label:c.confidence>=80?"HIGH":c.confidence>=65?"MEDIUM":"LOW",
+        reason:c.reason,
+      }));
+      data.totalScore = data.confidence || 50;
+      data.bullPct = data.signal==="RISE"?data.confidence:100-data.confidence;
+      data.bearPct = data.signal==="FALL"?data.confidence:100-data.confidence;
+      data.bullVotes = data.signal==="RISE"?data.confidence:100-data.confidence;
+      data.bearVotes = data.signal==="FALL"?data.confidence:100-data.confidence;
+      data.pattern = data.trend||"";
+      data.smc = { signals:[], score:0 };
+      data.chart = { name:"AI Analysis" };
+      data.categories = {};
       setAnalysis(data);
       if (data.signal!=="WAIT"&&soundOn) playAlert(data.tier);
     } catch(e) {
-      setError(e.name==="AbortError"?"Request timed out — retry":e.message);
+      setError(e.name==="AbortError"?"Gemini taking too long — retry":e.message);
     }
     setLoading(false);
   };
@@ -538,10 +587,10 @@ export default function DerivSignals({ dark }) {
             <div>
               <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:13, fontWeight:900,
                 color:"#fff", letterSpacing:2, marginBottom:2 }}>
-                💎 PRINCEX IQ MEGA SIGNALS
+                🤖 PRINCEX IQ AI SIGNALS
               </div>
               <div style={{ fontSize:9, color:t.muted }}>
-                30-POINT CONFLUENCE · 9 CATEGORIES · 5 CANDLE PREDICTION · DERIV VOLATILITY
+                GEMINI AI · READS EVERY CANDLE · 5 CANDLE PREDICTION · DERIV VOLATILITY
               </div>
             </div>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
@@ -626,7 +675,7 @@ export default function DerivSignals({ dark }) {
             onClick={getSignal} disabled={loading||candles.length<30}
             style={{ padding:"16px", background:"linear-gradient(135deg,#8844ff,#6622dd)",
               color:"#fff", borderRadius:10, fontSize:13, letterSpacing:2 }}>
-            {loading?<><span className="dspin">⟳</span> ANALYZING 30 POINTS...</>:"💎 GET MEGA SIGNAL"}
+            {loading?<><span className="dspin">⟳</span> GEMINI AI THINKING...</>:"🤖 ASK AI FOR SIGNAL"}
           </button>
           <button className="dbtn" onClick={()=>setAutoScan(!autoScan)}
             style={{ padding:"14px", background:autoScan?"#ff224422":"#0066ff22",
