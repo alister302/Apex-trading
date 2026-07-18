@@ -71,6 +71,7 @@ function ScoreBar({ bullPct, bearPct }) {
 }
 
 function SignalCard({ result, dark, onClose }) {
+  try {
   if (!result || !result.signal || result.signal==="WAIT") return null;
   if (!result.entry || !result.sl || !result.tp1) return null;
   const sc = result.signal==="BUY"?"#00dd55":"#ff2244";
@@ -188,6 +189,14 @@ function SignalCard({ result, dark, onClose }) {
       )}
     </div>
   );
+  } catch(err) {
+    return (
+      <div style={{ background:"#1a0005", border:"1px solid #ff224433", borderRadius:10, padding:16, marginBottom:14 }}>
+        <div style={{ color:"#ff5577", fontSize:11, fontFamily:"monospace" }}>⚠ Signal display error: {err.message}</div>
+        <pre style={{ color:"#445566", fontSize:9, marginTop:8, overflow:"auto" }}>{JSON.stringify(result, null, 2)}</pre>
+      </div>
+    );
+  }
 }
 
 export default function PocketOptionAuto({ dark }) {
