@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 const SERVER = "https://apex-server-09p7.onrender.com";
 
+const TV_SYM = {"EUR/USD": "FX:EURUSD", "GBP/USD": "FX:GBPUSD", "USD/JPY": "FX:USDJPY", "USD/CHF": "FX:USDCHF", "USD/CAD": "FX:USDCAD", "AUD/USD": "FX:AUDUSD", "NZD/USD": "FX:NZDUSD", "EUR/GBP": "FX:EURGBP", "EUR/JPY": "FX:EURJPY", "GBP/JPY": "FX:GBPJPY", "XAU/USD": "TVC:GOLD", "EUR/CAD": "FX:EURCAD", "AUD/JPY": "FX:AUDJPY", "GBP/CAD": "FX:GBPCAD", "CAD/JPY": "FX:CADJPY"};
+const TF_MAP = {"1min": "1", "5min": "5", "15min": "15", "30min": "30", "1h": "60"};
 const PAIRS = [
   { symbol:"EUR/USD", flag:"🇪🇺" },
   { symbol:"GBP/USD", flag:"🇬🇧" },
@@ -90,14 +92,14 @@ function SignalCard({ result, dark, onClose }) {
         </div>
         <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:28, fontWeight:900, color:sc }}>{result.signal}</div>
         <div style={{ fontSize:11, color:sc, fontFamily:"monospace", marginTop:4 }}>
-          {result.confidence}% CONFIDENCE
+          {confidence}% CONFIDENCE
         </div>
         <div style={{ fontSize:9, color:"#8899aa", fontFamily:"monospace", marginTop:2 }}>
           {result.symbol} · {result.timeframe} · {result.session}
         </div>
       </div>
 
-      <ScoreBar bullPct={parseInt(result.bullPct)||50} bearPct={parseInt(result.bearPct)||50} />
+      <ScoreBar bullPct={bullPct} bearPct={bearPct} />
 
       {/* AI Reasoning */}
       {result.reasoning && (
@@ -144,10 +146,10 @@ function SignalCard({ result, dark, onClose }) {
       <div style={{ background:dark?"#0a1520":"rgba(0,0,0,0.05)", borderRadius:8, padding:"10px 12px", marginBottom:12 }}>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
           {[
-            ["🎯 ENTRY", result.entry, "#4499ff"],
-            ["🛑 STOP LOSS", result.sl, "#ff2244"],
-            ["✅ TP1", result.tp1, "#00dd55"],
-            ["✅✅ TP2", result.tp2, "#00ff88"],
+            ["🎯 ENTRY", entry.toFixed(5), "#4499ff"],
+            ["🛑 STOP LOSS", sl.toFixed(5), "#ff2244"],
+            ["✅ TP1", tp1.toFixed(5), "#00dd55"],
+            ["✅✅ TP2", tp2.toFixed(5), "#00ff88"],
           ].map(([l,v,c])=>(
             <div key={l} style={{ background:dark?"#050a0f":"rgba(0,0,0,0.05)", borderRadius:5, padding:"6px 8px" }}>
               <div style={{ fontSize:8, color:"#445566", marginBottom:2 }}>{l}</div>
@@ -161,13 +163,13 @@ function SignalCard({ result, dark, onClose }) {
       </div>
 
       {/* Next 3 candles */}
-      {result.next3candles && Array.isArray(result.next3candles) && result.next3candles.length>0 && (
+      {result.next3candles && next3.length>0 && (
         <div>
           <div style={{ fontSize:9, color:"#8844ff", fontFamily:"monospace", fontWeight:700, letterSpacing:1, marginBottom:8 }}>
             🔮 NEXT 3 CANDLES
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6 }}>
-            {result.next3candles.map((c,i)=>{
+            {next3.map((c,i)=>{
               const up=c.direction==="UP";
               const col=up?"#00dd55":"#ff2244";
               return (
@@ -340,6 +342,21 @@ export default function PocketOptionAuto({ dark }) {
         {/* ===== GET SIGNAL ===== */}
         {mode==="get" && (
           <div>
+
+            {/* TradingView Chart */}
+            <div style={{ borderRadius:8, overflow:"hidden", marginBottom:12, border:`1px solid ${t.border}` }}>
+              <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>
+                📊 {selectedPair.symbol} · {timeframe.label}
+              </div>
+              <iframe
+                key={selectedPair.symbol + timeframe.tf}
+                src={`https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(TV_SYM[selectedPair.symbol]||"FX:EURUSD")}&interval=${TF_MAP[timeframe.tf]||"15"}&theme=${dark?"dark":"light"}&style=1&locale=en&hide_top_toolbar=1&hide_legend=1&hide_side_toolbar=1&save_image=false`}
+                style={{ width:"100%", height:250, border:"none", display:"block" }}
+                title={selectedPair.symbol}
+                loading="lazy"
+              />
+            </div>
+
             {/* Pair selector */}
             <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12,
               padding:"12px 14px", marginBottom:12 }}>
