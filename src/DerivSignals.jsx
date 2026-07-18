@@ -302,6 +302,8 @@ function Dashboard({ analysis, dark }) {
 
 // ── Signal Card ──────────────────────────────────────────────────
 function SignalCard({ analysis, onClose }) {
+  if (!analysis) return null;
+  try {
   const [showCats, setShowCats] = useState(false);
   if (!analysis||analysis.signal==="WAIT") return null;
   const tc = TIER_CONFIG[analysis.tier]||TIER_CONFIG["MODERATE"];
@@ -454,6 +456,18 @@ function SignalCard({ analysis, onClose }) {
       </a>
     </div>
   );
+  } catch(err) {
+    return (
+      <div style={{ background:"#1a0005", border:"1px solid #ff4466", borderRadius:10, padding:16, margin:10 }}>
+        <div style={{ color:"#ff5577", fontSize:12, fontFamily:"monospace", marginBottom:8 }}>
+          ⚠️ Display error: {err.message}
+        </div>
+        <div style={{ color:"#00dd55", fontSize:11, fontFamily:"monospace" }}>
+          Signal: {analysis?.signal} | Confidence: {analysis?.confidence}%
+        </div>
+      </div>
+    );
+  }
 }
 
 // ── Main Component ────────────────────────────────────────────────
