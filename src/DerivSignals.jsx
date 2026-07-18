@@ -264,6 +264,7 @@ function Dashboard({ analysis, dark }) {
   if (!analysis) return null;
   const tc = TIER_CONFIG[analysis.tier]||TIER_CONFIG["WAIT"];
   const cats = analysis.categories||{};
+  const score = analysis.totalScore||analysis.confidence||50;
   const rows = [
     ["SCORE",       `${analysis.totalScore}/30`, tc.color],
     ["TIER",        analysis.tier, tc.color],
@@ -306,6 +307,7 @@ function SignalCard({ analysis, onClose }) {
   const tc = TIER_CONFIG[analysis.tier]||TIER_CONFIG["MODERATE"];
   const sc = analysis.signal==="RISE"?"#00dd55":"#ff2244";
   const cats = analysis.categories||{};
+  const score = analysis.totalScore||analysis.confidence||50;
 
   return (
     <div style={{ background:analysis.signal==="RISE"?"#001a0d":"#1a0005",
@@ -324,7 +326,7 @@ function SignalCard({ analysis, onClose }) {
           {analysis.signal==="RISE"?"▲":"▼"}
         </div>
         <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:28, fontWeight:900, color:sc }}>{analysis.signal}</div>
-        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, color:sc }}>{analysis.totalScore}/30 POINTS</div>
+        <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, color:sc }}>{analysis.totalScore||analysis.confidence||"?"} {analysis.totalScore?"/30 POINTS":"% CONFIDENCE"}</div>
         <div style={{ fontSize:10, color:"#8899aa", fontFamily:"monospace", marginTop:4 }}>
           {analysis.session} · {analysis.pattern} · {analysis.chart?.name!=="None"?analysis.chart?.name:""}
         </div>
@@ -346,9 +348,10 @@ function SignalCard({ analysis, onClose }) {
       {/* Category scores */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:5, marginBottom:14 }}>
         {[
-          ["TREND",cats.trendScore,5],["MOM",cats.momScore,4],["VOL",cats.volScore+cats.volumeScore,5],
-          ["SMC",cats.smcScore,5],["CANDLE",cats.candleScore,2],["CHART",cats.chartScore,3],
-          ["MTF",cats.mtfScore,3],["OSC",cats.oscScore,3],
+          ["CONF",analysis.confidence||0,100],["RSI",parseFloat(analysis.rsi||50).toFixed(0),100],
+          ["STREAK",analysis.streak||0,10],["TREND5",analysis.trend5==="UP"?1:0,1],
+          ["BULL",analysis.bullPct||50,100],["BEAR",analysis.bearPct||50,100],
+          ["BB",analysis.bbPosition==="INSIDE"?1:0,1],["MACD",analysis.macd>0?1:0,1],
         ].map(([l,v,m])=>(
           <div key={l} style={{ background:"#0a1520", borderRadius:5, padding:"5px 6px", textAlign:"center" }}>
             <div style={{ fontSize:7, color:"#445566", fontFamily:"monospace" }}>{l}</div>
