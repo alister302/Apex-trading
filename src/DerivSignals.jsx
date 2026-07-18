@@ -418,7 +418,7 @@ export default function DerivSignals({ dark }) {
                 ["BB",analysis.bbPosition||"N/A","#8844ff"],
                 ["TREND 5c",analysis.trend5||"N/A",analysis.trend5==="UP"?"#00dd55":"#ff2244"],
                 ["TREND 10c",analysis.trend10||"N/A",analysis.trend10==="UP"?"#00dd55":"#ff2244"],
-                ["MACD",analysis.macd>0?"BULL":"BEAR",analysis.macd>0?"#00dd55":"#ff2244"]].map(([l,v,c])=>(
+                ["MACD",parseFloat(analysis.macd||0)>0?"BULL":"BEAR",parseFloat(analysis.macd||0)>0?"#00dd55":"#ff2244"]].map(([l,v,c])=>(
                 <div key={l} style={{ background:"#0a1520", borderRadius:6, padding:"6px 8px", textAlign:"center" }}>
                   <div style={{ fontSize:7, color:"#445566", marginBottom:2 }}>{l}</div>
                   <div style={{ fontSize:9, color:c, fontWeight:700, fontFamily:"monospace" }}>{v}</div>
