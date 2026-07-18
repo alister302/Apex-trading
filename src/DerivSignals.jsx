@@ -336,6 +336,13 @@ export default function DerivSignals({ dark }) {
           </button>
         </div>
 
+        {/* Debug display */}
+        {analysis && (
+          <div style={{ background:"#0a1520", border:"1px solid #4499ff33", borderRadius:8, padding:"10px 14px", marginBottom:12, fontSize:9, color:"#4499ff", fontFamily:"monospace" }}>
+            RAW: sig={analysis.signal} conf={analysis.confidence} tier={analysis.tier} macd={String(analysis.macd).slice(0,8)} rsi={analysis.rsi} streak={analysis.streak}
+          </div>
+        )}
+
         {/* Signal Result */}
         {analysis && sig !== "WAIT" && (
           <div style={{ background:sig==="RISE"?"#001a0d":"#1a0005", border:`3px solid ${sc(sig)}`, borderRadius:14, padding:"18px 16px", marginBottom:14 }}>
