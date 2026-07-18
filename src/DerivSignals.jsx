@@ -336,127 +336,64 @@ export default function DerivSignals({ dark }) {
           </button>
         </div>
 
-        {/* Debug display */}
-        {analysis && (
-          <div style={{ background:"#0a1520", border:"1px solid #4499ff33", borderRadius:8, padding:"10px 14px", marginBottom:12, fontSize:9, color:"#4499ff", fontFamily:"monospace" }}>
-            RAW: sig={analysis.signal} conf={analysis.confidence} tier={analysis.tier} macd={String(analysis.macd).slice(0,8)} rsi={analysis.rsi} streak={analysis.streak}
-          </div>
-        )}
-
         {/* Signal Result */}
         {analysis && sig !== "WAIT" && (
-          <div style={{ background:sig==="RISE"?"#001a0d":"#1a0005", border:`3px solid ${sc(sig)}`, borderRadius:14, padding:"18px 16px", marginBottom:14 }}>
-
-            {/* Close button */}
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-              <div style={{ fontSize:10, color:sc(sig), fontFamily:"monospace", fontWeight:700, letterSpacing:2 }}>
-                {tier==="ELITE ULTRA"?"💎 ELITE ULTRA":tier==="STRONG"?"⭐⭐⭐ STRONG":tier==="MODERATE"?"⭐⭐ MODERATE":"⭐ "+tier}
-              </div>
-              <button onClick={()=>setAnalysis(null)} style={{ background:"none", border:"none", color:"#445566", cursor:"pointer", fontSize:20 }}>×</button>
+          <div style={{ background:sig==="RISE"?"#001a0d":"#1a0005", border:"3px solid "+(sig==="RISE"?"#00dd55":"#ff2244"), borderRadius:14, padding:"18px 16px", marginBottom:14 }}>
+            <div style={{ textAlign:"center", marginBottom:12 }}>
+              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:52, fontWeight:900, color:sig==="RISE"?"#00dd55":"#ff2244" }}>{sig==="RISE"?"▲":"▼"}</div>
+              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:28, fontWeight:900, color:sig==="RISE"?"#00dd55":"#ff2244" }}>{sig}</div>
+              <div style={{ fontSize:14, color:sig==="RISE"?"#00dd55":"#ff2244", fontFamily:"monospace", marginTop:4 }}>{conf}% CONFIDENCE</div>
+              <div style={{ fontSize:9, color:"#445566", marginTop:4 }}>{tier} · {selectedPair.name} · {timeframe.label}</div>
             </div>
-
-            {/* Direction */}
-            <div style={{ textAlign:"center", marginBottom:14 }}>
-              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:52, fontWeight:900, color:sc(sig), lineHeight:1 }}>
-                {sig==="RISE"?"▲":"▼"}
-              </div>
-              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:30, fontWeight:900, color:sc(sig) }}>{sig}</div>
-              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:18, color:sc(sig) }}>{conf}% CONFIDENCE</div>
-              <div style={{ fontSize:9, color:"#8899aa", fontFamily:"monospace", marginTop:4 }}>
-                {selectedPair.name} · {timeframe.label} · {analysis.session||""}
-              </div>
-            </div>
-
-            {/* Bull/Bear bar */}
-            <div style={{ marginBottom:12 }}>
-              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                <span style={{ fontSize:9, color:"#00dd55", fontFamily:"monospace" }}>RISE {analysis.bullPct||conf}%</span>
-                <span style={{ fontSize:9, color:"#ff2244", fontFamily:"monospace" }}>FALL {analysis.bearPct||(100-conf)}%</span>
-              </div>
-              <div style={{ height:8, background:"#0a1520", borderRadius:4, overflow:"hidden", display:"flex" }}>
-                <div style={{ width:`${analysis.bullPct||conf}%`, background:"linear-gradient(90deg,#00aa44,#00dd55)" }}/>
-                <div style={{ width:`${analysis.bearPct||(100-conf)}%`, background:"linear-gradient(90deg,#cc2244,#ff2244)" }}/>
-              </div>
-            </div>
-
-            {/* AI Reasoning */}
             {analysis.reasoning && (
-              <div style={{ background:"#0a0520", border:"1px solid #8844ff33", borderRadius:8, padding:"10px 12px", marginBottom:12 }}>
-                <div style={{ fontSize:8, color:"#8844ff", fontWeight:700, letterSpacing:1, marginBottom:5 }}>🤖 AI REASONING</div>
-                <div style={{ fontSize:10, color:"#c8d8e8", lineHeight:1.7, fontFamily:"monospace" }}>{analysis.reasoning}</div>
+              <div style={{ background:"#0a0520", border:"1px solid #8844ff33", borderRadius:8, padding:"10px", marginBottom:10 }}>
+                <div style={{ fontSize:8, color:"#8844ff", fontWeight:700, marginBottom:4 }}>🤖 AI REASONING</div>
+                <div style={{ fontSize:10, color:"#c8d8e8", lineHeight:1.6, fontFamily:"monospace" }}>{String(analysis.reasoning)}</div>
               </div>
             )}
-
-            {/* Detected patterns */}
-            {Array.isArray(analysis.patterns_detected) && analysis.patterns_detected.length>0 && (
-              <div style={{ marginBottom:12 }}>
-                <div style={{ fontSize:9, color:"#ffd700", fontWeight:700, letterSpacing:1, marginBottom:6 }}>🕯️ DETECTED PATTERNS</div>
-                {analysis.patterns_detected.map((p,i)=>(
-                  <div key={i} style={{ fontSize:9, fontFamily:"monospace", padding:"3px 0",
-                    color:p.includes("BULLISH")||p.includes("RISE")||p.includes("HAMMER")||p.includes("MORNING")?"#00dd55":
-                          p.includes("BEARISH")||p.includes("FALL")||p.includes("STAR")||p.includes("EVENING")?"#ff2244":"#ffaa00",
-                    borderBottom:"1px solid #1e304022" }}>
-                    🕯 {p}
-                  </div>
-                ))}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:10 }}>
+              <div style={{ background:"#050a0f", borderRadius:5, padding:"8px" }}>
+                <div style={{ fontSize:8, color:"#445566" }}>🎯 ENTRY</div>
+                <div style={{ fontSize:12, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>{String(analysis.entry||"")}</div>
               </div>
-            )}
-
-            {/* Entry/Exit */}
-            <div style={{ background:"#0a1520", borderRadius:8, padding:"10px 12px", marginBottom:12 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
-                {[["🎯 ENTRY",analysis.entry,"#4499ff"],["🛑 STOP",analysis.sl,"#ff2244"],
-                  ["✅ TP1",analysis.tp1,"#00dd55"],["✅✅ TP2",analysis.tp2,"#00ff88"]].map(([l,v,c])=>(
-                  <div key={l} style={{ background:"#050a0f", borderRadius:5, padding:"6px 8px" }}>
-                    <div style={{ fontSize:8, color:"#445566", marginBottom:2 }}>{l}</div>
-                    <div style={{ fontSize:11, color:c, fontFamily:"monospace", fontWeight:700 }}>{v||"N/A"}</div>
-                  </div>
-                ))}
+              <div style={{ background:"#050a0f", borderRadius:5, padding:"8px" }}>
+                <div style={{ fontSize:8, color:"#445566" }}>🛑 STOP LOSS</div>
+                <div style={{ fontSize:12, color:"#ff2244", fontFamily:"monospace", fontWeight:700 }}>{String(analysis.sl||"")}</div>
               </div>
-              <div style={{ marginTop:8, fontSize:9, color:"#ffaa00", fontFamily:"monospace" }}>
-                ⏱ Expiry: {analysis.min_expiry_min||2}-{analysis.max_expiry_min||10} min · Best: {analysis.best_expiry_candles||3} candles
+              <div style={{ background:"#050a0f", borderRadius:5, padding:"8px" }}>
+                <div style={{ fontSize:8, color:"#445566" }}>✅ TP1</div>
+                <div style={{ fontSize:12, color:"#00dd55", fontFamily:"monospace", fontWeight:700 }}>{String(analysis.tp1||"")}</div>
+              </div>
+              <div style={{ background:"#050a0f", borderRadius:5, padding:"8px" }}>
+                <div style={{ fontSize:8, color:"#445566" }}>✅✅ TP2</div>
+                <div style={{ fontSize:12, color:"#00ff88", fontFamily:"monospace", fontWeight:700 }}>{String(analysis.tp2||"")}</div>
               </div>
             </div>
-
-            {/* Market info */}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6, marginBottom:12 }}>
-              {[["RSI",analysis.rsi||"N/A","#4499ff"],
-                ["STREAK",`${analysis.streak||0} ${analysis.streakDir||""}`.trim(),"#ffaa00"],
-                ["BB",analysis.bbPosition||"N/A","#8844ff"],
-                ["TREND 5c",analysis.trend5||"N/A",analysis.trend5==="UP"?"#00dd55":"#ff2244"],
-                ["TREND 10c",analysis.trend10||"N/A",analysis.trend10==="UP"?"#00dd55":"#ff2244"],
-                ["MACD",parseFloat(analysis.macd||0)>0?"BULL":"BEAR",parseFloat(analysis.macd||0)>0?"#00dd55":"#ff2244"]].map(([l,v,c])=>(
-                <div key={l} style={{ background:"#0a1520", borderRadius:6, padding:"6px 8px", textAlign:"center" }}>
-                  <div style={{ fontSize:7, color:"#445566", marginBottom:2 }}>{l}</div>
-                  <div style={{ fontSize:9, color:c, fontWeight:700, fontFamily:"monospace" }}>{v}</div>
-                </div>
-              ))}
+            <div style={{ fontSize:9, color:"#ffaa00", fontFamily:"monospace", marginBottom:10 }}>
+              ⏱ Expiry: {String(analysis.min_expiry_min||2)}-{String(analysis.max_expiry_min||10)} min · Best: {String(analysis.best_expiry_candles||3)} candles
             </div>
-
-            {/* Risk warning */}
             {analysis.risk_warning && (
-              <div style={{ background:"#1a1000", border:"1px solid #ffaa0033", borderRadius:6, padding:"8px 12px", marginBottom:12, fontSize:9, color:"#ffaa00", fontFamily:"monospace" }}>
-                ⚠️ {analysis.risk_warning}
+              <div style={{ background:"#1a1000", border:"1px solid #ffaa0033", borderRadius:6, padding:"8px", marginBottom:10, fontSize:9, color:"#ffaa00", fontFamily:"monospace" }}>
+                ⚠️ {String(analysis.risk_warning)}
               </div>
             )}
-
-            {/* 5 candle predictions */}
-            {preds.length>0 && (
-              <div style={{ marginBottom:12 }}>
-                <div style={{ fontSize:9, color:"#8844ff", fontFamily:"monospace", fontWeight:700, letterSpacing:1, marginBottom:8 }}>🔮 NEXT 5 CANDLES</div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:5 }}>
-                  {preds.map((c,i)=><CandlePredict key={i} candle={c} dark={dark}/>)}
+            {Array.isArray(analysis.next5candles) && analysis.next5candles.length>0 && (
+              <div style={{ marginBottom:10 }}>
+                <div style={{ fontSize:9, color:"#8844ff", fontWeight:700, marginBottom:6 }}>🔮 NEXT 5 CANDLES</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:4 }}>
+                  {analysis.next5candles.map((c,i)=>(
+                    <div key={i} style={{ background:"#0a1520", borderRadius:6, padding:"6px 4px", textAlign:"center", borderTop:"3px solid "+(c.direction==="UP"?"#00dd55":"#ff2244") }}>
+                      <div style={{ fontSize:7, color:"#445566" }}>C{i+1}</div>
+                      <div style={{ fontSize:16, color:c.direction==="UP"?"#00dd55":"#ff2244" }}>{c.direction==="UP"?"▲":"▼"}</div>
+                      <div style={{ fontSize:10, color:c.direction==="UP"?"#00dd55":"#ff2244", fontWeight:700 }}>{c.confidence}%</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-
-            {/* CTA */}
-            <a href="https://dtrader.deriv.com" target="_blank" rel="noopener noreferrer"
-              style={{ display:"block", padding:"14px", background:`linear-gradient(135deg,${sc(sig)},${sc(sig)}99)`,
-                color:sig==="RISE"?"#000":"#fff", borderRadius:10, fontSize:12, fontWeight:900,
-                textDecoration:"none", textAlign:"center", letterSpacing:2 }}>
-              📈 OPEN {sig} TRADE ON DERIV →
-            </a>
+            <button onClick={()=>setAnalysis(null)} style={{ width:"100%", padding:"10px", background:"transparent", border:"1px solid #445566", color:"#445566", borderRadius:8, cursor:"pointer", fontFamily:"monospace", fontSize:11 }}>
+              CLOSE
+            </button>
           </div>
         )}
 
