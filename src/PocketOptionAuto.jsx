@@ -69,7 +69,8 @@ function ScoreBar({ bullPct, bearPct }) {
 }
 
 function SignalCard({ result, dark, onClose }) {
-  if (!result || result.signal==="WAIT") return null;
+  if (!result || !result.signal || result.signal==="WAIT") return null;
+  if (!result.entry || !result.sl || !result.tp1) return null;
   const sc = result.signal==="BUY"?"#00dd55":"#ff2244";
   const tc = TIER_COLOR[result.tier]||"#00aaff";
 
@@ -96,7 +97,7 @@ function SignalCard({ result, dark, onClose }) {
         </div>
       </div>
 
-      <ScoreBar bullPct={result.bullPct||50} bearPct={result.bearPct||50} />
+      <ScoreBar bullPct={parseInt(result.bullPct)||50} bearPct={parseInt(result.bearPct)||50} />
 
       {/* AI Reasoning */}
       {result.reasoning && (
@@ -160,7 +161,7 @@ function SignalCard({ result, dark, onClose }) {
       </div>
 
       {/* Next 3 candles */}
-      {result.next3candles?.length>0 && (
+      {result.next3candles && Array.isArray(result.next3candles) && result.next3candles.length>0 && (
         <div>
           <div style={{ fontSize:9, color:"#8844ff", fontFamily:"monospace", fontWeight:700, letterSpacing:1, marginBottom:8 }}>
             🔮 NEXT 3 CANDLES
