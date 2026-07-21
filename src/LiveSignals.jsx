@@ -3,7 +3,7 @@ import PocketOptionAuto from "./PocketOptionAuto";
 import ExnessSignals from "./ExnessSignals";
 import DerivSignals from "./DerivSignals";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-ip.vercel.app";
 
 const ALL_PAIRS = [
   { symbol:"EUR/USD", type:"forex", tv:"EURUSD" },

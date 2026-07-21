@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-ip.vercel.app";
 
 const VOLATILITY_PAIRS = [
   { symbol:"R_10",    name:"Volatility 10",   short:"V10"   },

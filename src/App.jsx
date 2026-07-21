@@ -14,7 +14,7 @@ import { supabase } from "./supabase";
 import AffiliatePage from "./AffiliatePage";
 import InfluencerPage from "./InfluencerPage";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-ip.vercel.app";
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
 const PROMPT = `You are PRINCEX IQ — elite candlestick analyst. Analyze chart screenshot. ALWAYS give prediction. Return ONLY JSON:

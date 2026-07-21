@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-ip.vercel.app";
 
 const ALL_PAIRS = [
   { symbol:"EUR/USD", flag:"🇪🇺🇺🇸", tv:"FX:EURUSD" },

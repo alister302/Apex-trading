@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const SERVER = "https://apex-server-09p7.onrender.com";
+const SERVER = "https://princex-ip.vercel.app";
 
 export default function InfluencerPage({ user, supabase, dark, onClose }) {
   const [view, setView] = useState("loading"); // loading|register|dashboard
