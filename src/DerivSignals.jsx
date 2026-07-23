@@ -183,8 +183,18 @@ export default function DerivSignals({ dark }) {
     wsRef.current=ws;
     ws.onopen=()=>{
       setWsStatus("connected");
-      ws.send(JSON.stringify({ticks:selectedPair.symbol,subscribe:1}));
-      ws.send(JSON.stringify({ticks_history:selectedPair.symbol,count:100,end:"latest",granularity:timeframe.value,style:"candles",subscribe:1}));
+      // Request candles first
+      ws.send(JSON.stringify({
+        ticks_history: selectedPair.symbol,
+        adjust_start_time: 1,
+        count: 100,
+        end: "latest",
+        granularity: timeframe.value,
+        style: "candles",
+        subscribe: 1
+      }));
+      // Then subscribe to ticks for live price
+      ws.send(JSON.stringify({ ticks: selectedPair.symbol, subscribe: 1 }));
     };
     ws.onmessage=e=>{
       const d=JSON.parse(e.data);
@@ -198,7 +208,11 @@ export default function DerivSignals({ dark }) {
         u[0]={...u[0],close:parseFloat(o.close),high:Math.max(u[0].high,parseFloat(o.high)),low:Math.min(u[0].low,parseFloat(o.low))};
         candlesRef.current=u;setCandles([...u]);
       }
-      if(d.error) setError(d.error.message);
+      if(d.error) {
+        setError("Symbol " + selectedPair.symbol + " error: " + d.error.message);
+        // Try reconnecting with different format
+        log && console.log("WS Error:", d.error);
+      }
     };
     ws.onerror=()=>{setWsStatus("error");setError("WebSocket error");};
     ws.onclose=()=>setWsStatus("disconnected");
