@@ -168,6 +168,12 @@ export default function DerivSignals({ dark }) {
   const [wsStatus,     setWsStatus]     = useState("disconnected");
   const [soundOn,      setSoundOn]      = useState(true);
   const [autoScan,     setAutoScan]     = useState(false);
+  const [derivToken,   setDerivToken]   = useState(localStorage.getItem("deriv_token")||null);
+  const [derivAccount, setDerivAccount] = useState(null);
+  const [tradeAmount,  setTradeAmount]  = useState(1);
+  const [duration,     setDuration]     = useState({ type:"t", value:5 });
+  const [tradeLoading, setTradeLoading] = useState(false);
+  const [tradeResult,  setTradeResult]  = useState(null);
   const wsRef      = useRef(null);
   const candlesRef = useRef([]);
   const autoRef    = useRef(null);
@@ -175,6 +181,53 @@ export default function DerivSignals({ dark }) {
 
   const t = { bg:"#0a0a0a", bgCard:"#0d0d0d", border:"#1e3040", muted:"#445566", dim:"#334455" };
   const sc = s=>s==="RISE"?"#00dd55":s==="FALL"?"#ff2244":"#ffaa00";
+
+  // Handle OAuth callback
+  useEffect(()=>{
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token1") || params.get("token");
+    if (token) {
+      localStorage.setItem("deriv_token", token);
+      setDerivToken(token);
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
+
+  // Get account info when token available
+  useEffect(()=>{
+    if (!derivToken || !wsRef.current) return;
+    if (wsRef.current.readyState === 1) {
+      wsRef.current.send(JSON.stringify({ authorize: derivToken }));
+    }
+  }, [derivToken, wsStatus]);
+
+  // Place trade function
+  const placeTrade = async (direction) => {
+    if (!derivToken) { 
+      window.location.href = "https://oauth.deriv.com/oauth2/authorize?app_id=33UkT2qA409Ez6jqg3tW0&l=en&brand=deriv";
+      return; 
+    }
+    setTradeLoading(true); setTradeResult(null);
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== 1) { setTradeLoading(false); return; }
+    
+    const contract = {
+      buy: 1,
+      price: tradeAmount,
+      parameters: {
+        amount: tradeAmount,
+        basis: "stake",
+        contract_type: direction === "RISE" ? "CALL" : "PUT",
+        currency: "USD",
+        duration: duration.value,
+        duration_unit: duration.type,
+        symbol: selectedPair.symbol,
+      }
+    };
+    
+    ws.send(JSON.stringify(contract));
+    setTradeLoading(false);
+  };
 
   const connectWS = useCallback(()=>{
     if(wsRef.current) wsRef.current.close();
@@ -207,6 +260,13 @@ export default function DerivSignals({ dark }) {
         const o=d.ohlc,u=[...candlesRef.current];
         u[0]={...u[0],close:parseFloat(o.close),high:Math.max(u[0].high,parseFloat(o.high)),low:Math.min(u[0].low,parseFloat(o.low))};
         candlesRef.current=u;setCandles([...u]);
+      }
+      if(d.msg_type==="authorize") {
+        setDerivAccount(d.authorize);
+        log && console.log("Deriv authorized:", d.authorize?.loginid);
+      }
+      if(d.msg_type==="buy") {
+        setTradeResult({ success:true, contract_id:d.buy?.contract_id, price:d.buy?.buy_price });
       }
       if(d.error) {
         setError("Symbol " + selectedPair.symbol + " error: " + d.error.message);
@@ -430,6 +490,103 @@ export default function DerivSignals({ dark }) {
             </div>
           </div>
         )}
+
+        {/* Trading Panel */}
+        <div style={{ background:"#0a0a0a", border:"2px solid #00dd5544", borderRadius:12, padding:"16px", marginTop:14 }}>
+          <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:11, fontWeight:900, color:"#00dd55", letterSpacing:2, marginBottom:12 }}>
+            📈 TRADE ON DERIV
+          </div>
+
+          {!derivToken ? (
+            <div style={{ textAlign:"center" }}>
+              <div style={{ fontSize:10, color:"#8899aa", marginBottom:12 }}>Connect your Deriv account to trade directly</div>
+              <button onClick={()=>window.location.href="https://oauth.deriv.com/oauth2/authorize?app_id=33UkT2qA409Ez6jqg3tW0&l=en&brand=deriv"}
+                style={{ padding:"14px 24px", background:"linear-gradient(135deg,#ff444f,#cc2233)", color:"#fff", borderRadius:10, fontSize:12, fontWeight:900, border:"none", cursor:"pointer", letterSpacing:1, width:"100%" }}>
+                🔗 CONNECT DERIV ACCOUNT
+              </button>
+            </div>
+          ) : (
+            <div>
+              {/* Account info */}
+              {derivAccount && (
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:12, background:"#0a1520", borderRadius:8, padding:"8px 12px" }}>
+                  <div>
+                    <div style={{ fontSize:9, color:"#445566" }}>ACCOUNT</div>
+                    <div style={{ fontSize:11, color:"#fff", fontWeight:700 }}>{derivAccount.loginid}</div>
+                  </div>
+                  <div style={{ textAlign:"right" }}>
+                    <div style={{ fontSize:9, color:"#445566" }}>BALANCE</div>
+                    <div style={{ fontSize:11, color:"#00dd55", fontWeight:700 }}>{derivAccount.balance} {derivAccount.currency}</div>
+                  </div>
+                  <button onClick={()=>{ localStorage.removeItem("deriv_token"); setDerivToken(null); setDerivAccount(null); }}
+                    style={{ background:"none", border:"1px solid #445566", color:"#445566", borderRadius:5, padding:"4px 8px", cursor:"pointer", fontSize:9 }}>
+                    LOGOUT
+                  </button>
+                </div>
+              )}
+
+              {/* Stake amount */}
+              <div style={{ marginBottom:10 }}>
+                <div style={{ fontSize:9, color:"#445566", marginBottom:5 }}>STAKE AMOUNT (USD)</div>
+                <div style={{ display:"flex", gap:5 }}>
+                  {[1,2,5,10,25,50].map(amt=>(
+                    <button key={amt} onClick={()=>setTradeAmount(amt)}
+                      style={{ flex:1, padding:"8px 4px", background:tradeAmount===amt?"#00dd55":"#0a1520", border:`1px solid ${tradeAmount===amt?"#00dd55":"#1e3040"}`, color:tradeAmount===amt?"#000":"#8899aa", borderRadius:5, cursor:"pointer", fontSize:10, fontWeight:700 }}>
+                      ${amt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div style={{ marginBottom:12 }}>
+                <div style={{ fontSize:9, color:"#445566", marginBottom:5 }}>DURATION</div>
+                <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+                  {[
+                    {label:"1 Tick",  type:"t", value:1},
+                    {label:"5 Ticks", type:"t", value:5},
+                    {label:"10 Ticks",type:"t", value:10},
+                    {label:"1 Min",   type:"m", value:1},
+                    {label:"5 Min",   type:"m", value:5},
+                    {label:"15 Min",  type:"m", value:15},
+                    {label:"30 Min",  type:"m", value:30},
+                    {label:"1 Hour",  type:"h", value:1},
+                    {label:"4 Hours", type:"h", value:4},
+                    {label:"8 Hours", type:"h", value:8},
+                    {label:"24 Hours",type:"h", value:24},
+                  ].map(d=>(
+                    <button key={d.label} onClick={()=>setDuration({type:d.type,value:d.value})}
+                      style={{ padding:"6px 10px", background:duration.type===d.type&&duration.value===d.value?"#8844ff":"#0a1520",
+                        border:`1px solid ${duration.type===d.type&&duration.value===d.value?"#8844ff":"#1e3040"}`,
+                        color:duration.type===d.type&&duration.value===d.value?"#fff":"#8899aa",
+                        borderRadius:5, cursor:"pointer", fontSize:9, fontWeight:700 }}>
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Trade buttons */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:10 }}>
+                <button onClick={()=>placeTrade("RISE")} disabled={tradeLoading}
+                  style={{ padding:"16px", background:"linear-gradient(135deg,#00aa44,#007733)", color:"#fff", borderRadius:10, fontSize:13, fontWeight:900, border:"none", cursor:"pointer", letterSpacing:1 }}>
+                  ▲ RISE
+                </button>
+                <button onClick={()=>placeTrade("FALL")} disabled={tradeLoading}
+                  style={{ padding:"16px", background:"linear-gradient(135deg,#cc2244,#991133)", color:"#fff", borderRadius:10, fontSize:13, fontWeight:900, border:"none", cursor:"pointer", letterSpacing:1 }}>
+                  ▼ FALL
+                </button>
+              </div>
+
+              {/* Trade result */}
+              {tradeResult && (
+                <div style={{ background:tradeResult.success?"#001a0d":"#1a0005", border:`1px solid ${tradeResult.success?"#00dd5533":"#ff224433"}`, borderRadius:8, padding:"10px 14px", fontSize:10, color:tradeResult.success?"#00dd55":"#ff5577", fontFamily:"monospace" }}>
+                  {tradeResult.success ? `✅ Trade placed! Contract: ${tradeResult.contract_id} · Cost: $${tradeResult.price}` : `❌ ${tradeResult.error}`}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Deriv CTA */}
         <div style={{ background:"#0a0510", border:"1px solid #8844ff33", borderRadius:10, padding:"14px 16px", marginTop:14 }}>
