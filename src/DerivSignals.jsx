@@ -278,7 +278,7 @@ export default function DerivSignals({ dark }) {
     ws.onclose=()=>setWsStatus("disconnected");
   },[selectedPair,timeframe]);
 
-  useEffect(()=>{connectWS();return()=>{wsRef.current?.close();clearTimeout(priceTimer.current);};},[selectedPair,timeframe]);
+  useEffect(()=>{fetchCandles();return()=>{wsRef.current?.close();clearTimeout(priceTimer.current);};},[selectedPair,timeframe]);
 
   useEffect(()=>{
     clearInterval(autoRef.current);
