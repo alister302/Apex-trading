@@ -3,16 +3,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const SERVER = "https://princex-ip.vercel.app";
 
 const VOLATILITY_PAIRS = [
-  { symbol:"R_10",    name:"Volatility 10",   short:"V10"   },
-  { symbol:"R_25",    name:"Volatility 25",   short:"V25"   },
-  { symbol:"R_50",    name:"Volatility 50",   short:"V50"   },
-  { symbol:"R_75",    name:"Volatility 75",   short:"V75"   },
-  { symbol:"R_100",   name:"Volatility 100",  short:"V100"  },
-  { symbol:"1HZ10V",  name:"Vol 10 (1s)",     short:"V10s"  },
-  { symbol:"1HZ25V",  name:"Vol 25 (1s)",     short:"V25s"  },
-  { symbol:"1HZ50V",  name:"Vol 50 (1s)",     short:"V50s"  },
-  { symbol:"1HZ75V",  name:"Vol 75 (1s)",     short:"V75s"  },
-  { symbol:"1HZ100V", name:"Vol 100 (1s)",    short:"V100s" },
+  { symbol:"R_10",    name:"Volatility 10 Index",   short:"V10"   },
+  { symbol:"R_25",    name:"Volatility 25 Index",   short:"V25"   },
+  { symbol:"R_50",    name:"Volatility 50 Index",   short:"V50"   },
+  { symbol:"R_75",    name:"Volatility 75 Index",   short:"V75"   },
+  { symbol:"R_100",   name:"Volatility 100 Index",  short:"V100"  },
+  { symbol:"1HZ10V",  name:"Volatility 10 (1s) Index",  short:"V10s"  },
+  { symbol:"1HZ25V",  name:"Volatility 25 (1s) Index",  short:"V25s"  },
+  { symbol:"1HZ50V",  name:"Volatility 50 (1s) Index",  short:"V50s"  },
+  { symbol:"1HZ75V",  name:"Volatility 75 (1s) Index",  short:"V75s"  },
+  { symbol:"1HZ100V", name:"Volatility 100 (1s) Index", short:"V100s" },
 ];
 
 const TIMEFRAMES = [
