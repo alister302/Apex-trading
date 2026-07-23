@@ -179,7 +179,7 @@ export default function DerivSignals({ dark }) {
   const connectWS = useCallback(()=>{
     if(wsRef.current) wsRef.current.close();
     setWsStatus("connecting"); setError(""); setCandles([]); candlesRef.current=[];
-    const ws=new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=1089");
+    const ws=new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=33UkT2qA409Ez6jqg3tW0");
     wsRef.current=ws;
     ws.onopen=()=>{
       setWsStatus("connected");
