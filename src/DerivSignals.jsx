@@ -236,7 +236,7 @@ export default function DerivSignals({ dark }) {
     wsRef.current=ws;
     ws.onopen=()=>{
       setWsStatus("connected");
-      // Request candles first
+      // Request candles - new Deriv API format
       ws.send(JSON.stringify({
         ticks_history: selectedPair.symbol,
         adjust_start_time: 1,
@@ -246,7 +246,7 @@ export default function DerivSignals({ dark }) {
         style: "candles",
         subscribe: 1
       }));
-      // Then subscribe to ticks for live price
+      // Subscribe to live ticks
       ws.send(JSON.stringify({ ticks: selectedPair.symbol, subscribe: 1 }));
     };
     ws.onmessage=e=>{
