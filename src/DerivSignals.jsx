@@ -5,7 +5,16 @@ const WS_URL  = "wss://ws.derivws.com/websockets/v3?app_id=1089";
 
 // Will be populated from active_symbols
 const DEFAULT_PAIRS = [
-  { symbol:"stpRNG", name:"Step Index", short:"STEP" },
+  { symbol:"R_10",    name:"Volatility 10",   short:"V10"   },
+  { symbol:"R_25",    name:"Volatility 25",   short:"V25"   },
+  { symbol:"R_50",    name:"Volatility 50",   short:"V50"   },
+  { symbol:"R_75",    name:"Volatility 75",   short:"V75"   },
+  { symbol:"R_100",   name:"Volatility 100",  short:"V100"  },
+  { symbol:"1HZ10V",  name:"Vol 10 (1s)",     short:"V10s"  },
+  { symbol:"1HZ25V",  name:"Vol 25 (1s)",     short:"V25s"  },
+  { symbol:"1HZ50V",  name:"Vol 50 (1s)",     short:"V50s"  },
+  { symbol:"1HZ75V",  name:"Vol 75 (1s)",     short:"V75s"  },
+  { symbol:"1HZ100V", name:"Vol 100 (1s)",    short:"V100s" },
 ];
 
 const TIMEFRAMES = [
@@ -179,43 +188,14 @@ export default function DerivSignals({ dark }) {
     ws.onopen = () => {
       setWsStatus("connected");
       setError("");
-      // Try ticks_history directly
-      ws.send(JSON.stringify({
-        ticks_history: "R_50",
-        count: 10,
-        end: "latest",
-        granularity: 60,
-        style: "candles"
-      }));
+      requestCandles(ws, selectedPair.symbol, timeframe.value);
+      ws.send(JSON.stringify({ ticks: selectedPair.symbol, subscribe: 1 }));
     };
 
     ws.onmessage = (e) => {
       const d = JSON.parse(e.data);
-      setError(prev => (prev.length > 300 ? "" : prev) + " | " + d.msg_type + (d.error?":"+d.error.message:""));
 
-      if (d.msg_type === "active_symbols") {
-        const allSyms = (d.active_symbols||[]).map(s=>s.symbol).join(",");
-        console.log("ALL SYMBOLS:", allSyms);
-        setError("DEBUG SYMBOLS: " + (d.active_symbols||[]).filter(s=>s.symbol.includes("HZ")||s.symbol.startsWith("R_")||s.symbol.includes("VOL")).map(s=>s.symbol).join(",").slice(0,200));
-        // Update pairs list with valid symbols from Deriv
-        const volSyms = (d.active_symbols || [])
-          .filter(s => s.market === "synthetic_index" && 
-            (s.symbol.startsWith("R_") || s.symbol.startsWith("1HZ")))
-          .map(s => ({
-            symbol: s.symbol,
-            name: s.display_name || s.symbol,
-            short: s.symbol.replace("1HZ","V").replace("V","V").replace("_",""),
-          }));
-        if (volSyms.length > 0) {
-          setPairs(volSyms);
-          // If current selected pair is invalid, switch to first valid one
-          const isValid = volSyms.find(p => p.symbol === selectedPair.symbol);
-          if (!isValid) {
-            setSelectedPair(volSyms[0]);
-            requestCandles(ws, volSyms[0].symbol, timeframe.value);
-          }
-        }
-      }
+
 
       if (d.msg_type === "tick") {
         clearTimeout(priceTimer.current);
