@@ -5,16 +5,16 @@ const WS_URL  = "wss://ws.derivws.com/websockets/v3?app_id=1089";
 
 // Will be populated from active_symbols
 const DEFAULT_PAIRS = [
-  { symbol:"R_10",    name:"Volatility 10",   short:"V10"   },
-  { symbol:"R_25",    name:"Volatility 25",   short:"V25"   },
-  { symbol:"R_50",    name:"Volatility 50",   short:"V50"   },
-  { symbol:"R_75",    name:"Volatility 75",   short:"V75"   },
-  { symbol:"R_100",   name:"Volatility 100",  short:"V100"  },
-  { symbol:"1HZ10V",  name:"Vol 10 (1s)",     short:"V10s"  },
-  { symbol:"1HZ25V",  name:"Vol 25 (1s)",     short:"V25s"  },
-  { symbol:"1HZ50V",  name:"Vol 50 (1s)",     short:"V50s"  },
-  { symbol:"1HZ75V",  name:"Vol 75 (1s)",     short:"V75s"  },
-  { symbol:"1HZ100V", name:"Vol 100 (1s)",    short:"V100s" },
+  { symbol:"VOLI10",    name:"Volatility 10",    short:"V10"   },
+  { symbol:"VOLI25",    name:"Volatility 25",    short:"V25"   },
+  { symbol:"VOLI50",    name:"Volatility 50",    short:"V50"   },
+  { symbol:"VOLI75",    name:"Volatility 75",    short:"V75"   },
+  { symbol:"VOLI100",   name:"Volatility 100",   short:"V100"  },
+  { symbol:"VOLI10_1S", name:"Vol 10 (1s)",      short:"V10s"  },
+  { symbol:"VOLI25_1S", name:"Vol 25 (1s)",      short:"V25s"  },
+  { symbol:"VOLI50_1S", name:"Vol 50 (1s)",      short:"V50s"  },
+  { symbol:"VOLI75_1S", name:"Vol 75 (1s)",      short:"V75s"  },
+  { symbol:"VOLI100_1S",name:"Vol 100 (1s)",     short:"V100s" },
 ];
 
 const TIMEFRAMES = [
