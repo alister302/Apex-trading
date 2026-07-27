@@ -178,14 +178,13 @@ export default function DerivSignals({ dark }) {
 
     ws.onopen = () => {
       setWsStatus("connected");
-      // Get valid symbols first
+      setError("WS Open - testing...");
       ws.send(JSON.stringify({ active_symbols: "brief", product_type: "basic" }));
-      // Also request candles immediately
-      requestCandles(ws, selectedPair.symbol, timeframe.value);
     };
 
     ws.onmessage = (e) => {
       const d = JSON.parse(e.data);
+      setError(prev => (prev.length > 300 ? "" : prev) + " | " + d.msg_type + (d.error?":"+d.error.message:""));
 
       if (d.msg_type === "active_symbols") {
         const allSyms = (d.active_symbols||[]).map(s=>s.symbol).join(",");
