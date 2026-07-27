@@ -5,16 +5,7 @@ const WS_URL  = "wss://ws.derivws.com/websockets/v3?app_id=1089";
 
 // Will be populated from active_symbols
 const DEFAULT_PAIRS = [
-  { symbol:"VOLI10",    name:"Volatility 10",    short:"V10"   },
-  { symbol:"VOLI25",    name:"Volatility 25",    short:"V25"   },
-  { symbol:"VOLI50",    name:"Volatility 50",    short:"V50"   },
-  { symbol:"VOLI75",    name:"Volatility 75",    short:"V75"   },
-  { symbol:"VOLI100",   name:"Volatility 100",   short:"V100"  },
-  { symbol:"VOLI10_1S", name:"Vol 10 (1s)",      short:"V10s"  },
-  { symbol:"VOLI25_1S", name:"Vol 25 (1s)",      short:"V25s"  },
-  { symbol:"VOLI50_1S", name:"Vol 50 (1s)",      short:"V50s"  },
-  { symbol:"VOLI75_1S", name:"Vol 75 (1s)",      short:"V75s"  },
-  { symbol:"VOLI100_1S",name:"Vol 100 (1s)",     short:"V100s" },
+  { symbol:"stpRNG", name:"Step Index", short:"STEP" },
 ];
 
 const TIMEFRAMES = [
@@ -197,6 +188,9 @@ export default function DerivSignals({ dark }) {
       const d = JSON.parse(e.data);
 
       if (d.msg_type === "active_symbols") {
+        const allSyms = (d.active_symbols||[]).map(s=>s.symbol).join(",");
+        console.log("ALL SYMBOLS:", allSyms);
+        setError("DEBUG SYMBOLS: " + (d.active_symbols||[]).filter(s=>s.symbol.includes("HZ")||s.symbol.startsWith("R_")||s.symbol.includes("VOL")).map(s=>s.symbol).join(",").slice(0,200));
         // Update pairs list with valid symbols from Deriv
         const volSyms = (d.active_symbols || [])
           .filter(s => s.market === "synthetic_index" && 
