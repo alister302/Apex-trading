@@ -5,16 +5,16 @@ const WS_URL  = "wss://ws.derivws.com/websockets/v3?app_id=1089";
 
 // Will be populated from active_symbols
 const DEFAULT_PAIRS = [
-  { symbol:"R_10",    name:"Volatility 10",   short:"V10"   },
-  { symbol:"R_25",    name:"Volatility 25",   short:"V25"   },
   { symbol:"R_50",    name:"Volatility 50",   short:"V50"   },
   { symbol:"R_75",    name:"Volatility 75",   short:"V75"   },
   { symbol:"R_100",   name:"Volatility 100",  short:"V100"  },
-  { symbol:"1HZ10V",  name:"Vol 10 (1s)",     short:"V10s"  },
-  { symbol:"1HZ25V",  name:"Vol 25 (1s)",     short:"V25s"  },
+  { symbol:"R_10",    name:"Volatility 10",   short:"V10"   },
+  { symbol:"R_25",    name:"Volatility 25",   short:"V25"   },
   { symbol:"1HZ50V",  name:"Vol 50 (1s)",     short:"V50s"  },
   { symbol:"1HZ75V",  name:"Vol 75 (1s)",     short:"V75s"  },
   { symbol:"1HZ100V", name:"Vol 100 (1s)",    short:"V100s" },
+  { symbol:"1HZ10V",  name:"Vol 10 (1s)",     short:"V10s"  },
+  { symbol:"1HZ25V",  name:"Vol 25 (1s)",     short:"V25s"  },
 ];
 
 const TIMEFRAMES = [
@@ -228,7 +228,18 @@ export default function DerivSignals({ dark }) {
       }
 
       if (d.error) {
-        setError(d.error.message || "Deriv error");
+        if (d.error.code === "InvalidSymbol") {
+          // Symbol invalid - try next valid one
+          const validFallbacks = ["R_50","R_75","R_100","1HZ50V","1HZ75V"];
+          const current = selectedPair.symbol;
+          const next = validFallbacks.find(s => s !== current);
+          if (next && wsRef.current?.readyState === 1) {
+            setError("Auto-switching to " + next);
+            requestCandles(wsRef.current, next, timeframe.value);
+          }
+        } else {
+          setError(d.error.message || "Deriv error");
+        }
       }
     };
 
