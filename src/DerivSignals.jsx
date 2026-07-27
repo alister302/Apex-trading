@@ -189,7 +189,6 @@ export default function DerivSignals({ dark }) {
       setWsStatus("connected");
       setError("");
       requestCandles(ws, selectedPair.symbol, timeframe.value);
-      ws.send(JSON.stringify({ ticks: selectedPair.symbol, subscribe: 1 }));
     };
 
     ws.onmessage = (e) => {
@@ -200,6 +199,10 @@ export default function DerivSignals({ dark }) {
       if (d.msg_type === "tick") {
         clearTimeout(priceTimer.current);
         priceTimer.current = setTimeout(() => setLivePrice(d.tick?.quote), 300);
+      }
+      // Also update live price from candle updates
+      if (d.msg_type === "ohlc" && d.ohlc) {
+        setLivePrice(parseFloat(d.ohlc.close));
       }
 
       if (d.msg_type === "candles") {
