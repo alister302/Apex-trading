@@ -178,8 +178,15 @@ export default function DerivSignals({ dark }) {
 
     ws.onopen = () => {
       setWsStatus("connected");
-      setError("WS Open - testing...");
-      ws.send(JSON.stringify({ active_symbols: "brief", product_type: "basic" }));
+      setError("");
+      // Try ticks_history directly
+      ws.send(JSON.stringify({
+        ticks_history: "R_50",
+        count: 10,
+        end: "latest",
+        granularity: 60,
+        style: "candles"
+      }));
     };
 
     ws.onmessage = (e) => {
