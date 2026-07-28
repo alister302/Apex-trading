@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Academy from "./Academy";
 import CandleEncyclopedia from "./CandleEncyclopedia";
+import CtraderTab from "./CtraderTab";
 import Quiz from "./Quiz";
 import Fast from "./Fast";
 import LongTerm from "./LongTerm";
