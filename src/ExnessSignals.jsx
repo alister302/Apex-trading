@@ -72,6 +72,22 @@ function ScoreBar({ bull, bear, dark }) {
       <div style={{ height:8, background:dark?"#0a1520":"#e0eaf4", borderRadius:4, overflow:"hidden", display:"flex" }}>
         <div style={{ width:`${bull}%`, background:"linear-gradient(90deg,#00aa44,#00dd55)" }} />
         <div style={{ width:`${bear}%`, background:"linear-gradient(90deg,#cc2244,#ff2244)" }} />
+      {/* Exness WebTrader */}
+        <div style={{ background:dark?"#0a1520":"#e8f4ff", border:"1px solid #0066ff33", borderRadius:10, padding:"14px 16px", marginTop:14 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+            <div>
+              <div style={{ fontSize:10, color:"#4499ff", fontWeight:700, marginBottom:3 }}>📊 TRADE ON EXNESS</div>
+              <div style={{ fontSize:9, color:dark?"#8899aa":"#445566" }}>Open WebTrader with your signal pair</div>
+            </div>
+            <a href={`https://www.exness.com/trade/?symbol=${selectedPair.replace("/","")}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ padding:"10px 18px", background:"linear-gradient(135deg,#0066ff,#0044bb)",
+                color:"#fff", borderRadius:8, fontSize:10, fontWeight:700, textDecoration:"none", letterSpacing:1 }}>
+              OPEN EXNESS →
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -173,6 +189,22 @@ function SignalCard({ sig, dark, onClose }) {
         <div>🐊 Alligator: {sig.alligatorStatus}</div>
         <div>☁️ AlgoAlpha: {sig.algoStatus}</div>
         <div>📊 ADX: {sig.adx} · RSI: {sig.rsi} · Session: {sig.session?.name}</div>
+      {/* Exness WebTrader */}
+        <div style={{ background:dark?"#0a1520":"#e8f4ff", border:"1px solid #0066ff33", borderRadius:10, padding:"14px 16px", marginTop:14 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+            <div>
+              <div style={{ fontSize:10, color:"#4499ff", fontWeight:700, marginBottom:3 }}>📊 TRADE ON EXNESS</div>
+              <div style={{ fontSize:9, color:dark?"#8899aa":"#445566" }}>Open WebTrader with your signal pair</div>
+            </div>
+            <a href={`https://www.exness.com/trade/?symbol=${selectedPair.replace("/","")}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ padding:"10px 18px", background:"linear-gradient(135deg,#0066ff,#0044bb)",
+                color:"#fff", borderRadius:8, fontSize:10, fontWeight:700, textDecoration:"none", letterSpacing:1 }}>
+              OPEN EXNESS →
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -196,6 +228,22 @@ function ExitCard({ exit, dark, onClose }) {
         <div style={{ fontSize:10, color:"#ff5577", fontFamily:"monospace", marginBottom:4 }}>Reason: {exit.reasons.join(" + ")}</div>
         <div style={{ fontSize:10, color:"#8899aa", fontFamily:"monospace" }}>Direction was: {exit.prevSignal}</div>
         <div style={{ fontSize:10, color:"#ffd700", fontFamily:"monospace" }}>Exit Price: {exit.price}</div>
+      {/* Exness WebTrader */}
+        <div style={{ background:dark?"#0a1520":"#e8f4ff", border:"1px solid #0066ff33", borderRadius:10, padding:"14px 16px", marginTop:14 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+            <div>
+              <div style={{ fontSize:10, color:"#4499ff", fontWeight:700, marginBottom:3 }}>📊 TRADE ON EXNESS</div>
+              <div style={{ fontSize:9, color:dark?"#8899aa":"#445566" }}>Open WebTrader with your signal pair</div>
+            </div>
+            <a href={`https://www.exness.com/trade/?symbol=${selectedPair.replace("/","")}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ padding:"10px 18px", background:"linear-gradient(135deg,#0066ff,#0044bb)",
+                color:"#fff", borderRadius:8, fontSize:10, fontWeight:700, textDecoration:"none", letterSpacing:1 }}>
+              OPEN EXNESS →
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -596,6 +644,22 @@ export default function ExnessSignals({ dark }) {
             ))}
           </div>
         )}
+
+      {/* Exness WebTrader */}
+        <div style={{ background:dark?"#0a1520":"#e8f4ff", border:"1px solid #0066ff33", borderRadius:10, padding:"14px 16px", marginTop:14 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+            <div>
+              <div style={{ fontSize:10, color:"#4499ff", fontWeight:700, marginBottom:3 }}>📊 TRADE ON EXNESS</div>
+              <div style={{ fontSize:9, color:dark?"#8899aa":"#445566" }}>Open WebTrader with your signal pair</div>
+            </div>
+            <a href={`https://www.exness.com/trade/?symbol=${selectedPair.replace("/","")}`}
+              target="_blank" rel="noopener noreferrer"
+              style={{ padding:"10px 18px", background:"linear-gradient(135deg,#0066ff,#0044bb)",
+                color:"#fff", borderRadius:8, fontSize:10, fontWeight:700, textDecoration:"none", letterSpacing:1 }}>
+              OPEN EXNESS →
+            </a>
+          </div>
+        </div>
 
       </div>
     </div>
