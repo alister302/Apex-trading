@@ -408,6 +408,7 @@ export default function App() {
           {tab==="longterm" && <LongTerm dark={dark} />}
           {tab==="elite" && <Elite dark={dark} />}
           {tab==="risk" && <RiskCalc dark={dark} />}
+          {tab==="ctrader" && <CtraderTab dark={dark} />}
           {tab==="live" && <LiveSignals dark={dark} isPremium={true} isAdmin={true} />}
 
           {tab==="partner" && <div style={{padding:20,fontFamily:"'IBM Plex Mono',monospace",color:dark?"#c8d8e8":"#1a2a3a"}}>
