@@ -214,14 +214,14 @@ export default function MT5Tab({ dark }) {
         )}
 
         {/* Step 3 - Dashboard */}
-        {step==="dashboard" && account && (
+        {step==="dashboard" && account && account.connected && (
           <div>
             {/* Account info */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:12 }}>
               {[
-                ["BALANCE",  `$${parseFloat(account.balance||0).toFixed(2)}`,  "#00dd55"],
-                ["EQUITY",   `$${parseFloat(account.equity||0).toFixed(2)}`,   "#4499ff"],
-                ["MARGIN",   `$${parseFloat(account.margin||0).toFixed(2)}`,   "#ffaa00"],
+                ["BALANCE",  `$${parseFloat(account?.balance||0).toFixed(2)}`,  "#00dd55"],
+                ["EQUITY",   `$${parseFloat(account?.equity||0).toFixed(2)}`,   "#4499ff"],
+                ["MARGIN",   `$${parseFloat(account?.margin||0).toFixed(2)}`,   "#ffaa00"],
               ].map(([l,v,c])=>(
                 <div key={l} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"10px", textAlign:"center" }}>
                   <div style={{ fontSize:7, color:t.dim, letterSpacing:1 }}>{l}</div>
@@ -231,9 +231,9 @@ export default function MT5Tab({ dark }) {
             </div>
 
             <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"8px 12px", marginBottom:12, display:"flex", justifyContent:"space-between" }}>
-              <div style={{ fontSize:9, color:t.dim }}>Account: {account.login} · {broker?.name}</div>
+              <div style={{ fontSize:9, color:t.dim }}>Account: {account?.login} · {broker?.name}</div>
               <div style={{ fontSize:9, color:account.isDemo?"#4499ff":"#ff4400", fontWeight:700 }}>
-                {account.isDemo?"🔵 DEMO":"🔴 LIVE"}
+                {account?.isDemo?"🔵 DEMO":"🔴 LIVE"}
               </div>
             </div>
 
