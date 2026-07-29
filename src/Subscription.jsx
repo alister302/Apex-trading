@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const SERVER = "https://princex-ip.vercel.app";
+const SERVER = "https://princex-api.onrender.com";
 
 const PLANS = [
   { id:"weekly",   name:"WEEKLY",   price:499,   period:"7 days",   color:"#0066ff", features:["All live signals","Sniper scanner","Auto analysis","Push notifications"] },

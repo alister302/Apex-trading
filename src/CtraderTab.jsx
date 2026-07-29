@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const SERVER = "https://princex-ip.vercel.app";
+const SERVER = "https://princex-api.onrender.com";
 const CLIENT_ID = "34564_kvAwGQP6l98aezoF1bzp40f6DDSHqwgFLZDV6yptOpzRa5iPV7";
 const REDIRECT_URI = "https://princex-iq.vercel.app";
 const AUTH_URL = `https://connect.spotware.com/apps/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=trading`;

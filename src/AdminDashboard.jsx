@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./supabase";
 
-const SERVER = "https://princex-ip.vercel.app";
+const SERVER = "https://princex-api.onrender.com";
 
 export default function AdminDashboard({ dark, onExit }) {
   const [tab, setTab] = useState("stats");
