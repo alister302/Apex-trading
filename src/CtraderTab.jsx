@@ -17,6 +17,7 @@ export default function CtraderTab({ dark }) {
   const [lotSize, setLotSize]   = useState(0.01);
   const [tradeResult, setTradeResult] = useState(null);
   const [chartTF, setChartTF] = useState("15");
+  const [tradeSymbol, setTradeSymbol] = useState("EURUSD");
 
   const t = {
     bg: dark?"#050a0f":"#f0f4f8",
