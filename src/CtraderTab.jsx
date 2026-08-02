@@ -16,6 +16,7 @@ export default function CtraderTab({ dark }) {
   const [error, setError]       = useState("");
   const [lotSize, setLotSize]   = useState(0.01);
   const [tradeResult, setTradeResult] = useState(null);
+  const [chartTF, setChartTF] = useState("15");
 
   const t = {
     bg: dark?"#050a0f":"#f0f4f8",
@@ -95,7 +96,7 @@ export default function CtraderTab({ dark }) {
         headers:{"Content-Type":"application/json","x-ctrader-token":token},
         body: JSON.stringify({
           accountId: selected.accountId,
-          symbol: "EURUSD",
+          symbol: tradeSymbol,
           direction,
           volume: Math.round(lotSize * 100000),
         }),
@@ -227,6 +228,28 @@ export default function CtraderTab({ dark }) {
                 ))}
               </div>
             )}
+
+            {/* TradingView Chart */}
+            <div style={{ borderRadius:10, overflow:"hidden", marginBottom:12, border:`1px solid ${t.border}` }}>
+              <div style={{ padding:"5px 10px", background:dark?"#0a1520":"#e8f4ff", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <span style={{ fontSize:9, color:"#4499ff", fontFamily:"monospace", fontWeight:700 }}>📊 LIVE CHART · {tradeSymbol} · 15M</span>
+                <div style={{ display:"flex", gap:5 }}>
+                  {["1","5","15","60","240"].map(tf=>(
+                    <button key={tf} onClick={()=>setChartTF(tf)}
+                      style={{ padding:"2px 6px", background:chartTF===tf?"#0066ff":"transparent", border:`1px solid ${chartTF===tf?"#0066ff":t.border}`, color:chartTF===tf?"#fff":t.muted, borderRadius:3, fontSize:8, cursor:"pointer" }}>
+                      {tf==="1"?"1M":tf==="5"?"5M":tf==="15"?"15M":tf==="60"?"1H":"4H"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <iframe
+                key={tradeSymbol+chartTF}
+                src={`https://www.tradingview.com/widgetembed/?symbol=FX:${tradeSymbol.replace("XAU","GOLD").replace("USD","USD")}&interval=${chartTF}&theme=${dark?"dark":"light"}&style=1&locale=en&hide_top_toolbar=0&hide_legend=0&hide_side_toolbar=0&save_image=false&studies=RSI@tv-basicstudies,MACD@tv-basicstudies,BB@tv-basicstudies`}
+                style={{ width:"100%", height:400, border:"none", display:"block" }}
+                title={tradeSymbol}
+                loading="lazy"
+              />
+            </div>
 
             {/* Trading panel */}
             <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, padding:"16px", marginBottom:12 }}>
