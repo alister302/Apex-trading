@@ -218,9 +218,9 @@ export default function CtraderTab({ dark }) {
             {balance && (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:12 }}>
                 {[
-                  ["BALANCE", `$${(balance.balance/100).toFixed(2)}`, "#00dd55"],
-                  ["EQUITY",  `$${(balance.equity/100).toFixed(2)}`,  "#4499ff"],
-                  ["MARGIN",  `$${(balance.margin/100).toFixed(2)}`,  "#ffaa00"],
+                  ["BALANCE", `$${parseFloat(balance.balance||balance.totalBalance||0).toFixed(2)}`, "#00dd55"],
+                  ["EQUITY",  `$${parseFloat(balance.equity||balance.totalBalance||0).toFixed(2)}`,   "#4499ff"],
+                  ["MARGIN",  `$${parseFloat(balance.margin||balance.usedMargin||0).toFixed(2)}`,     "#ffaa00"],
                 ].map(([l,v,c])=>(
                   <div key={l} style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:8, padding:"10px", textAlign:"center" }}>
                     <div style={{ fontSize:7, color:t.dim, letterSpacing:1 }}>{l}</div>
