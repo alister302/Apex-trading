@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const SERVER = "https://princex-api.onrender.com";
-const WS_URL  = "wss://ws.derivws.com/websockets/v3?app_id=1089";
+const WS_URL  = "wss://api.derivws.com/trading/v1/options/ws/public";
 
 // Will be populated from active_symbols
 const DEFAULT_PAIRS = [
