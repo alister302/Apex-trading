@@ -22,7 +22,7 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemi
 const PROMPT = `You are PRINCEX IQ — elite candlestick analyst. Analyze chart screenshot. ALWAYS give prediction. Return ONLY JSON:
 {"pair":"UNKNOWN","timeframe":"","market_bias":"BULLISH or BEARISH or NEUTRAL","trend":"","patterns":[],"support":"","resistance":"","entry_signal":"BUY or SELL or WAIT","trade_duration":"","candles":[{"number":1,"direction":"UP or DOWN","strength":"STRONG or MEDIUM or WEAK","confidence":85,"reason":""},{"number":2,"direction":"UP or DOWN","strength":"STRONG or MEDIUM or WEAK","confidence":80,"reason":""},{"number":3,"direction":"UP or DOWN","strength":"STRONG or MEDIUM or WEAK","confidence":75,"reason":""}],"summary":""}`;
 
-const PREMIUM_TABS = ["analyzer","academy","quiz","fast","longterm","elite","risk","live","ctrader","mt5"];
+const PREMIUM_TABS = ["analyzer","academy","quiz","fast","longterm","elite","risk","live","ctrader","mt5","derivtrade"];
 
 function maskEmail(email) {
   if (!email) return "";
@@ -411,6 +411,7 @@ export default function App() {
           {tab==="elite" && <Elite dark={dark} />}
           {tab==="risk" && <RiskCalc dark={dark} />}
           {tab==="ctrader" && <CtraderTab dark={dark} />}
+          {tab==="derivtrade" && <DerivTrading dark={dark} />}
           {tab==="mt5" && <MT5Tab dark={dark} />}
           {tab==="live" && <LiveSignals dark={dark} isPremium={true} isAdmin={true} />}
 
