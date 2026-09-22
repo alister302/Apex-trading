@@ -250,6 +250,7 @@ export default function App() {
     {id:"partner",label:"💼 PARTNER",premium:false},
     {id:"ctrader",label:"🔴 PEPPERSTONE",premium:true},
     {id:"mt5",label:"📊 MT5 BROKER",premium:true},
+    {id:"derivtrade",label:"📈 DERIV TRADE",premium:true},
   ];
 
   if (splash) return <Splash onDone={() => setSplash(false)} />;
