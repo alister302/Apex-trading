@@ -35,7 +35,7 @@ async function handleDerivCallback() {
     const res = await fetch("https://princex-api.onrender.com/deriv/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, code_verifier: codeVerifier }),
+      body: JSON.stringify({ code, code_verifier: codeVerifier, redirect_uri: "https://princex-iq.vercel.app" }),
     });
     const data = await res.json();
     if (data.access_token) {

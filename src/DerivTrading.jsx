@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 const SERVER = "https://princex-api.onrender.com";
 const DERIV_CLIENT_ID = "33UkT2qA409Ez6jqg3tW0";
-const REDIRECT_URI = "https://princex-iq.vercel.app/callback";
+const REDIRECT_URI = "https://princex-iq.vercel.app";
 
 async function buildOAuthURL() {
   const array = crypto.getRandomValues(new Uint8Array(64));
