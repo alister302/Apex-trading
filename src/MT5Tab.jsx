@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const SERVER = "https://princex-api.onrender.com";
 
@@ -27,6 +27,13 @@ export default function MT5Tab({ dark }) {
   const [symbol, setSymbol]       = useState("EURUSD");
   const [lotSize, setLotSize]     = useState(0.01);
   const [tradeResult, setTradeResult] = useState(null);
+  const [monitoring, setMonitoring]   = useState(false);
+  const [monitorAll, setMonitorAll]   = useState(false);
+  const [alerts, setAlerts]           = useState([]);
+  const [ringing, setRinging]         = useState(false);
+  const monitorRef = useRef(null);
+  const audioRef   = useRef(null);
+  const ringRef    = useRef(null);
   const [step, setStep]           = useState("broker"); // broker, login, dashboard
 
   const t = {
@@ -102,6 +109,75 @@ export default function MT5Tab({ dark }) {
     setStep("broker"); setBroker(null);
     localStorage.removeItem("mt5_session");
   };
+
+
+  // ─── EMA Calculation ───────────────────────────────────────────────────────
+  const calcEMA = (prices, period) => {
+    const k = 2 / (period + 1);
+    let ema = prices[0];
+    for (let i = 1; i < prices.length; i++) ema = prices[i] * k + ema * (1 - k);
+    return ema;
+  };
+
+  // ─── Ring phone for 15 seconds ─────────────────────────────────────────────
+  const ringPhone = (msg) => {
+    setRinging(true);
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.8, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(); osc.stop(ctx.currentTime + 0.4);
+      elapsed += 600;
+      if (elapsed >= 15000) { clearInterval(interval); setRinging(false); }
+    }, 600);
+    ringRef.current = interval;
+    setAlerts(prev => [{ time: new Date().toLocaleTimeString(), msg }, ...prev.slice(0,19)]);
+  };
+
+  // ─── Check EMA crossover for one symbol ────────────────────────────────────
+  const checkEMA = async (sym) => {
+    try {
+      const url = `https://api.twelvedata.com/time_series?symbol=${sym}&interval=15min&outputsize=60&apikey=62e0549bbdc04d76a224157e22da6bbd`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.values || data.values.length < 51) return;
+      const closes = data.values.map(v => parseFloat(v.close)).reverse();
+      const prevCloses = closes.slice(0, -1);
+      const ema20now  = calcEMA(closes, 20);
+      const ema50now  = calcEMA(closes, 50);
+      const ema20prev = calcEMA(prevCloses, 20);
+      const ema50prev = calcEMA(prevCloses, 50);
+      const bullCross = ema20prev < ema50prev && ema20now > ema50now;
+      const bearCross = ema20prev > ema50prev && ema20now < ema50now;
+      if (bullCross) ringPhone(`🟢 BULLISH CROSS on ${sym} — EMA20 crossed above EMA50!`);
+      if (bearCross) ringPhone(`🔴 BEARISH CROSS on ${sym} — EMA20 crossed below EMA50!`);
+    } catch(e) { console.log("EMA check error:", e); }
+  };
+
+  // ─── Start/Stop monitoring ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (monitoring) {
+      const pairs = monitorAll
+        ? (broker?.name==="Deriv CFDs" ? DERIV_PAIRS.slice(0,5) : PAIRS)
+        : [symbol];
+      pairs.forEach(s => checkEMA(s));
+      monitorRef.current = setInterval(() => {
+        const p = monitorAll
+          ? (broker?.name==="Deriv CFDs" ? DERIV_PAIRS.slice(0,5) : PAIRS)
+          : [symbol];
+        p.forEach(s => checkEMA(s));
+      }, 60000);
+    } else {
+      clearInterval(monitorRef.current);
+    }
+    return () => clearInterval(monitorRef.current);
+  }, [monitoring, monitorAll, symbol, broker]);
 
   return (
     <div style={{ background:t.bg, minHeight:"100%", fontFamily:"'IBM Plex Mono',monospace" }}>
@@ -240,6 +316,55 @@ export default function MT5Tab({ dark }) {
             </div>
 
 
+
+            {/* EMA Monitor */}
+            <div style={{ background:t.bgCard, border:`2px solid ${monitoring?"#00dd55":"#0d2a42"}`, borderRadius:12, padding:"14px 16px", marginBottom:12 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+                <div>
+                  <div style={{ fontSize:10, color:"#00dd55", fontWeight:700, letterSpacing:1 }}>📡 EMA CROSSOVER MONITOR</div>
+                  <div style={{ fontSize:8, color:t.dim, marginTop:2 }}>EMA 20 × EMA 50 · 15min · Rings 15s on cross</div>
+                </div>
+                {ringing && <div style={{ fontSize:9, color:"#ff4466", fontWeight:700, animation:"blink 0.5s infinite" }}>🔔 RINGING...</div>}
+              </div>
+              <div style={{ display:"flex", gap:8, marginBottom:10, flexWrap:"wrap" }}>
+                <button className="mbtn" onClick={()=>setMonitoring(m=>!m)}
+                  style={{ padding:"10px 18px", background:monitoring?"#00dd5522":"transparent",
+                    border:`2px solid ${monitoring?"#00dd55":"#0d2a42"}`,
+                    color:monitoring?"#00dd55":t.muted, borderRadius:8, fontSize:10, fontWeight:700 }}>
+                  {monitoring?"⏹ STOP":"▶ START MONITOR"}
+                </button>
+                <button className="mbtn" onClick={()=>setMonitorAll(m=>!m)}
+                  style={{ padding:"10px 18px", background:monitorAll?"#4499ff22":"transparent",
+                    border:`2px solid ${monitorAll?"#4499ff":"#0d2a42"}`,
+                    color:monitorAll?"#4499ff":t.muted, borderRadius:8, fontSize:10, fontWeight:700 }}>
+                  {monitorAll?"🌍 ALL MARKETS":"🎯 CURRENT PAIR"}
+                </button>
+                {ringing && (
+                  <button className="mbtn" onClick={()=>{ clearInterval(ringRef.current); setRinging(false); }}
+                    style={{ padding:"10px 18px", background:"#ff224422", border:"2px solid #ff4466",
+                      color:"#ff4466", borderRadius:8, fontSize:10, fontWeight:700 }}>
+                    🔕 STOP RING
+                  </button>
+                )}
+              </div>
+              {monitoring && (
+                <div style={{ fontSize:9, color:"#4499ff", padding:"6px 10px", background:"#4499ff11", borderRadius:6, marginBottom:8 }}>
+                  ✅ Monitoring {monitorAll?"ALL pairs":""+symbol} every 60s
+                </div>
+              )}
+              {alerts.length > 0 && (
+                <div style={{ maxHeight:140, overflowY:"auto" }}>
+                  <div style={{ fontSize:9, color:t.dim, marginBottom:5, letterSpacing:1 }}>RECENT ALERTS</div>
+                  {alerts.map((a,i)=>(
+                    <div key={i} style={{ padding:"6px 8px", background:dark?"#0a1520":"#e8f4ff",
+                      borderRadius:6, marginBottom:4, borderLeft:`3px solid ${a.msg.includes("BULLISH")?"#00dd55":"#ff4466"}` }}>
+                      <div style={{ fontSize:8, color:t.dim }}>{a.time}</div>
+                      <div style={{ fontSize:10, color:dark?"#fff":"#001133", fontWeight:700 }}>{a.msg}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             {/* TradingView Chart */}
             <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, overflow:"hidden", marginBottom:12 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 12px", borderBottom:`1px solid ${t.border}` }}>
