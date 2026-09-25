@@ -239,6 +239,35 @@ export default function MT5Tab({ dark }) {
               </div>
             </div>
 
+
+            {/* TradingView Chart */}
+            <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 12px", borderBottom:`1px solid ${t.border}` }}>
+                <div style={{ fontSize:9, color:"#ffd700", fontWeight:700, letterSpacing:1 }}>📊 LIVE CHART</div>
+                <div style={{ display:"flex", gap:4 }}>
+                  {["1","5","15","60","240","D"].map(tf=>(
+                    <button key={tf} className="mbtn"
+                      onClick={()=>{
+                        const s = broker?.name==="Deriv CFDs"
+                          ? "VOLATILITY_10"
+                          : `FX:${symbol.replace("/","")}`;
+                        const frame = document.getElementById("mt5-tv-frame");
+                        if(frame) frame.src=`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol.includes("Index")||symbol.includes("Boom")||symbol.includes("Crash")?"CAPITALCOM:"+symbol.replace(/ /g,""):("FX:"+symbol))}&interval=${tf}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_side_toolbar=0&allow_symbol_change=1`;
+                      }}
+                      style={{ padding:"3px 7px", background:"transparent", border:`1px solid ${t.border}`,
+                        color:t.muted, borderRadius:4, fontSize:8 }}>
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <iframe
+                id="mt5-tv-frame"
+                src={`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol.includes("Index")||symbol.includes("Boom")||symbol.includes("Crash")?"CAPITALCOM:"+symbol.replace(/ /g,""):("FX:"+symbol))}&interval=15&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_side_toolbar=0&allow_symbol_change=1`}
+                style={{ width:"100%", height:320, border:"none", display:"block" }}
+                allowFullScreen
+              />
+            </div>
             {/* Trading panel */}
             <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, padding:"16px", marginBottom:12 }}>
               <div style={{ fontSize:10, color:"#ffd700", fontWeight:700, letterSpacing:1, marginBottom:12 }}>⚡ PLACE TRADE</div>
