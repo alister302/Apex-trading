@@ -15,6 +15,8 @@ import AdminDashboard from "./AdminDashboard";
 import { supabase } from "./supabase";
 import AffiliatePage from "./AffiliatePage";
 import InfluencerPage from "./InfluencerPage";
+import MT5Tab from "./MT5Tab";
+import DerivTrading from "./DerivTrading";
 
 const SERVER = "https://princex-api.onrender.com";
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
