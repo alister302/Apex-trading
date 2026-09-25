@@ -1,9 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 
 const SERVER = "https://princex-api.onrender.com";
-const DERIV_APP_ID = "33UkT2qA409Ez6jqg3tW0";
-const REDIRECT_URI = "https://princex-iq.vercel.app";
-const OAUTH_URL = `https://oauth.deriv.com/oauth2/authorize?app_id=${DERIV_APP_ID}&l=en&brand=deriv`;
+const DERIV_CLIENT_ID = "33UkT2qA409Ez6jqg3tW0";
+const REDIRECT_URI = "https://princex-iq.vercel.app/callback";
+
+async function buildOAuthURL() {
+  const array = crypto.getRandomValues(new Uint8Array(64));
+  const codeVerifier = Array.from(array)
+    .map(v => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[v % 66])
+    .join('');
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
+  const codeChallenge = btoa(String.fromCharCode(...new Uint8Array(hash)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const state = crypto.getRandomValues(new Uint8Array(16))
+    .reduce((s,b) => s + b.toString(16).padStart(2,'0'), '');
+  sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+  sessionStorage.setItem('oauth_state', state);
+  return `https://auth.deriv.com/oauth2/auth?response_type=code&client_id=${DERIV_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+}
 
 const SYMBOLS = [
   { symbol:"R_10",    name:"Volatility 10",   short:"V10"  },
@@ -34,7 +48,7 @@ const DURATIONS = [
 const STAKES = [0.5, 1, 2, 5, 10, 25, 50, 100];
 
 export default function DerivTrading({ dark }) {
-  const [token,        setToken]        = useState(localStorage.getItem("deriv_token")||null);
+  const [token,        setToken]        = useState(localStorage.getItem("deriv_access_token")||null);
   const [accounts,     setAccounts]     = useState(JSON.parse(localStorage.getItem("deriv_accounts")||"[]"));
   const [activeAcc,    setActiveAcc]    = useState(null);
   const [balance,      setBalance]      = useState(null);
@@ -72,7 +86,7 @@ export default function DerivTrading({ dark }) {
     }
     if (token1 && accs.length > 0) {
       window.history.replaceState({}, "", "/");
-      localStorage.setItem("deriv_token", token1);
+      localStorage.setItem("deriv_access_token", data.access_token);
       localStorage.setItem("deriv_accounts", JSON.stringify(accs));
       setToken(token1);
       setAccounts(accs);
@@ -194,7 +208,7 @@ export default function DerivTrading({ dark }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("deriv_token");
+    localStorage.removeItem("deriv_access_token");
     localStorage.removeItem("deriv_accounts");
     setToken(null); setAccounts([]); setActiveAcc(null);
     setBalance(null); setWsStatus("disconnected");
@@ -264,7 +278,7 @@ export default function DerivTrading({ dark }) {
                 ✅ From $0.50 per trade<br/>
                 ✅ Instant payouts
               </div>
-              <button className="dbtn" onClick={()=>window.location.href=OAUTH_URL}
+              <button className="dbtn" onClick={async()=>{ const url = await buildOAuthURL(); window.location.href=url; }}
                 style={{ padding:"16px 32px", background:"linear-gradient(135deg,#ff444f,#cc2233)", color:"#fff",
                   borderRadius:10, fontSize:14, letterSpacing:2, width:"100%", marginBottom:10 }}>
                 🔗 CONNECT DERIV ACCOUNT

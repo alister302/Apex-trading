@@ -19,6 +19,34 @@ import MT5Tab from "./MT5Tab";
 import DerivTrading from "./DerivTrading";
 
 const SERVER = "https://princex-api.onrender.com";
+
+// Deriv OAuth callback handler
+async function handleDerivCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const state = params.get("state");
+  if (!code) return;
+  const storedState = sessionStorage.getItem("oauth_state");
+  if (state !== storedState) { console.error("State mismatch"); return; }
+  const codeVerifier = sessionStorage.getItem("pkce_code_verifier");
+  sessionStorage.removeItem("pkce_code_verifier");
+  sessionStorage.removeItem("oauth_state");
+  try {
+    const res = await fetch("https://princex-api.onrender.com/deriv/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, code_verifier: codeVerifier }),
+    });
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem("deriv_access_token", data.access_token);
+      window.history.replaceState({}, "", "/");
+      window.location.reload();
+    }
+  } catch(e) { console.error("Token exchange failed", e); }
+}
+if (window.location.search.includes("code=")) handleDerivCallback();
+
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
 const PROMPT = `You are PRINCEX IQ — elite candlestick analyst. Analyze chart screenshot. ALWAYS give prediction. Return ONLY JSON:
