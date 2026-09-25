@@ -9,9 +9,11 @@ const MT5_BROKERS = [
   { name:"FBS",       logo:"🔴", server:"mt5.fbs.com:443",         signup:"https://fbs.com/open-account" },
   { name:"HFM",       logo:"🟡", server:"mt5.hfm.com:443",         signup:"https://hfmarkets.com" },
   { name:"IC Markets",logo:"⚫", server:"mt5.icmarkets.com:443",   signup:"https://icmarkets.com" },
+  { name:"Deriv CFDs", logo:"🔴", server:"mt5.deriv.com:443",        signup:"https://deriv.com/signup/" },
 ];
 
 const PAIRS = ["EURUSD","GBPUSD","USDJPY","USDCHF","USDCAD","AUDUSD","XAUUSD","GBPJPY","EURJPY"];
+const DERIV_PAIRS = ["Boom 1000 Index","Boom 500 Index","Boom 300 Index","Crash 1000 Index","Crash 500 Index","Crash 300 Index","Volatility 10 Index","Volatility 25 Index","Volatility 50 Index","Volatility 75 Index","Volatility 100 Index","Step Index","Jump 10 Index","Jump 25 Index","Jump 50 Index","Jump 75 Index","Jump 100 Index"];
 
 export default function MT5Tab({ dark }) {
   const [broker, setBroker]       = useState(null);
