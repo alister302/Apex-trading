@@ -32,6 +32,17 @@ export default function MT5Tab({ dark }) {
   const [alerts, setAlerts]           = useState([]);
   const [ringing, setRinging]         = useState(false);
   const monitorRef = useRef(null);
+
+  // Load saved session
+  useEffect(()=>{
+    const saved = localStorage.getItem("mt5_session");
+    if (saved) {
+      try {
+        const { broker: b, login: l, account: a } = JSON.parse(saved);
+        setBroker(b); setLogin(l); setAccount(a); setConnected(true); setStep("dashboard");
+      } catch(e) { localStorage.removeItem("mt5_session"); }
+    }
+  }, []);
   const audioRef   = useRef(null);
   const ringRef    = useRef(null);
   const [step, setStep]           = useState("broker"); // broker, login, dashboard
@@ -57,6 +68,7 @@ export default function MT5Tab({ dark }) {
       if (data.error) { setError(data.error); setLoading(false); return; }
       setAccount(data);
       setConnected(true);
+      localStorage.setItem("mt5_session", JSON.stringify({ broker, login, account: data }));
       setStep("dashboard");
       localStorage.setItem("mt5_session", JSON.stringify({ login, broker:broker.name, server:broker.server }));
     } catch(e) { setError(e.message); }
@@ -110,6 +122,13 @@ export default function MT5Tab({ dark }) {
     localStorage.removeItem("mt5_session");
   };
 
+
+  const logout = () => {
+    localStorage.removeItem("mt5_session");
+    setBroker(null); setLogin(""); setPassword(""); setConnected(false);
+    setAccount(null); setPositions([]); setStep("broker");
+    setMonitoring(false); clearInterval(monitorRef.current);
+  };
 
   // ─── EMA Calculation ───────────────────────────────────────────────────────
   const calcEMA = (prices, period) => {
@@ -377,7 +396,7 @@ export default function MT5Tab({ dark }) {
                           ? "VOLATILITY_10"
                           : `FX:${symbol.replace("/","")}`;
                         const frame = document.getElementById("mt5-tv-frame");
-                        if(frame) frame.src=`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol.includes("Index")||symbol.includes("Boom")||symbol.includes("Crash")?"CAPITALCOM:"+symbol.replace(/ /g,""):("FX:"+symbol))}&interval=${tf}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_side_toolbar=0&allow_symbol_change=1`;
+                        if(frame) frame.src=`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol.includes("Index")||symbol.includes("Boom")||symbol.includes("Crash")?"CAPITALCOM:"+symbol.replace(/ /g,""):("FX:"+symbol))}&interval=${tf}&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_side_toolbar=0&allow_symbol_change=1&studies=MASimple%4020%2C0%2C0%2Ccl%2C0&studies=MASimple%4050%2C0%2C0%2Ccl%2C0`;
                       }}
                       style={{ padding:"3px 7px", background:"transparent", border:`1px solid ${t.border}`,
                         color:t.muted, borderRadius:4, fontSize:8 }}>
@@ -388,7 +407,7 @@ export default function MT5Tab({ dark }) {
               </div>
               <iframe
                 id="mt5-tv-frame"
-                src={`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol.includes("Index")||symbol.includes("Boom")||symbol.includes("Crash")?"CAPITALCOM:"+symbol.replace(/ /g,""):("FX:"+symbol))}&interval=15&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_side_toolbar=0&allow_symbol_change=1`}
+                src={`https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(symbol.includes("Index")||symbol.includes("Boom")||symbol.includes("Crash")?"CAPITALCOM:"+symbol.replace(/ /g,""):("FX:"+symbol))}&interval=15&theme=${dark?"dark":"light"}&style=1&locale=en&toolbar_bg=%23f1f3f6&hide_side_toolbar=0&allow_symbol_change=1&studies=MASimple%4020%2C0%2C0%2Ccl%2C0&studies=MASimple%4050%2C0%2C0%2Ccl%2C0`}
                 style={{ width:"100%", height:320, border:"none", display:"block" }}
                 allowFullScreen
               />
