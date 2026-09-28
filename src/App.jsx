@@ -47,6 +47,30 @@ async function handleDerivCallback() {
 }
 if (window.location.search.includes("code=")) handleDerivCallback();
 
+// cTrader OAuth callback handler
+async function handleCtraderCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  if (!code) return;
+  if (window.location.pathname !== "/callback") return;
+  window.history.replaceState({}, "", "/");
+  try {
+    const res = await fetch("https://princex-api.onrender.com/ctrader/exchange-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    const data = await res.json();
+    const tok = data.accessToken || data.access_token;
+    if (tok) {
+      localStorage.setItem("ct_token", tok);
+      window.location.reload();
+    }
+  } catch(e) { console.error("cTrader token exchange failed", e); }
+}
+if (window.location.pathname === "/callback") handleCtraderCallback();
+
+
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
 const PROMPT = `You are PRINCEX IQ — elite candlestick analyst. Analyze chart screenshot. ALWAYS give prediction. Return ONLY JSON:

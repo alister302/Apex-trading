@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 const SERVER = "https://princex-api.onrender.com";
 const CLIENT_ID = "34731_EFdh6Dqb0UOI6OdxQCwX4tt2PPzESSBdfWw8kwAokpw0xxSEA6";
-const REDIRECT_URI = "https://princex-iq.vercel.app";
+const REDIRECT_URI = "https://princex-iq.vercel.app/callback";
 const OAUTH_URL = `https://connect.spotware.com/apps/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=trading`;
 
 const SYMBOLS = ["EURUSD","GBPUSD","USDJPY","USDCHF","USDCAD","AUDUSD","NZDUSD","XAUUSD","XAGUSD","GBPJPY","EURJPY","USDZAR"];
