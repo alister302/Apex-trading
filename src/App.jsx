@@ -64,7 +64,8 @@ async function handleCtraderCallback() {
     const tok = data.accessToken || data.access_token;
     if (tok) {
       localStorage.setItem("ct_token", tok);
-      window.location.reload();
+      localStorage.setItem("return_tab", "ctrader");
+      window.location.replace("/");
     }
   } catch(e) { console.error("cTrader token exchange failed", e); }
 }
@@ -93,7 +94,11 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false);
   const [sub, setSub] = useState(null);
   const [dark, setDark] = useState(true);
-  const [tab, setTab] = useState("analyzer");
+  const [tab, setTab] = useState(()=>{
+    const rt = localStorage.getItem("return_tab");
+    if (rt) { localStorage.removeItem("return_tab"); return rt; }
+    return "analyzer";
+  });
   const [showAdmin, setShowAdmin] = useState(false);
   const [showSub, setShowSub] = useState(false);
   const [adminPrompt, setAdminPrompt] = useState(false);
