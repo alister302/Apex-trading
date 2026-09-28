@@ -168,6 +168,11 @@ export default function CtraderTab({ dark }) {
     dim:   dark?"#445566":"#778899",
   };
 
+  // Auto-set activeAcc when accounts load
+  useEffect(()=>{
+    if (accounts.length > 0 && !activeAcc) setActiveAcc(accounts[0]);
+  },[accounts]);
+
   useEffect(()=>{
     const onStorage=()=>{
       const tok=localStorage.getItem("ct_token");
