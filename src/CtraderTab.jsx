@@ -220,7 +220,7 @@ export default function CtraderTab({ dark }) {
             {loading ? (
               <div style={{fontSize:11,color:t.muted}}>Connecting...</div>
             ) : (
-              <button className="cbtn" onClick={()=>window.location.href=OAUTH_URL}
+              <button className="cbtn" onClick={()=>{ localStorage.setItem("return_tab","ctrader"); window.location.href=OAUTH_URL; }}
                 style={{padding:"16px 32px",background:"linear-gradient(135deg,#ff4400,#cc2200)",color:"#fff",borderRadius:10,fontSize:13,letterSpacing:2,width:"100%"}}>
                 🔗 CONNECT CTRADER ACCOUNT
               </button>
