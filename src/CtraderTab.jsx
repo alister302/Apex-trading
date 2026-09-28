@@ -43,13 +43,16 @@ function CtraderChart({ symbol, dark, ema1Period, ema2Period, extraEMAs }) {
   };
 
   const fetchCandles = useCallback(async()=>{
-    const s = getApiSym(); if (!s) return;
+    if (!symbol) return;
+    const s = symbol.length===6 && !symbol.includes("/") ? symbol.slice(0,3)+"/"+symbol.slice(3) : symbol;
     setLoading(true);
     try {
-      const res = await fetch(`https://api.twelvedata.com/time_series?symbol=${s}&interval=${TF_MAP[tf]}&outputsize=200&apikey=${TWELVE_KEY}`);
+      const res = await fetch(`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(s)}&interval=${TF_MAP[tf]}&outputsize=200&apikey=${TWELVE_KEY}`);
       const data = await res.json();
-      if (data.values) setCandles(data.values.map(v=>({t:v.datetime,o:parseFloat(v.open),h:parseFloat(v.high),l:parseFloat(v.low),c:parseFloat(v.close)})).reverse());
-    } catch(e){}
+      if (data.values && data.values.length) {
+        setCandles(data.values.map(v=>({t:v.datetime,o:parseFloat(v.open),h:parseFloat(v.high),l:parseFloat(v.low),c:parseFloat(v.close)})).reverse());
+      } else { setCandles([]); }
+    } catch(e){ console.log("Chart fetch error",e); }
     setLoading(false);
   },[symbol,tf]);
 
