@@ -66,6 +66,7 @@ async function handleCtraderCallback() {
       localStorage.setItem("ct_token", tok);
       localStorage.setItem("return_tab", "ctrader");
       window.history.replaceState({}, "", "/");
+      window.dispatchEvent(new Event("storage"));
     }
   } catch(e) { console.error("cTrader token exchange failed", e); }
 }

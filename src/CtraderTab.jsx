@@ -37,6 +37,21 @@ export default function CtraderTab({ dark }) {
     dim:   dark?"#445566":"#778899",
   };
 
+  // Listen for token saved by App.jsx callback handler
+  useEffect(()=>{
+    const onStorage = () => {
+      const tok = localStorage.getItem("ct_token");
+      const accs = JSON.parse(localStorage.getItem("ct_accounts")||"[]");
+      if (tok && !token) {
+        setToken(tok);
+        if (accs.length > 0) { setAccounts(accs); setActiveAcc(accs[0]); }
+        else fetchAccounts(tok);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  },[]);
+
   // Handle OAuth callback
   useEffect(()=>{
     const params = new URLSearchParams(window.location.search);
