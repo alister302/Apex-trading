@@ -212,7 +212,7 @@ export default function CtraderTab({ dark }) {
 
   const fetchAccounts=async(tok)=>{
     try{
-      const res=await fetch(`${SERVER}/ctrader/accounts`,{headers:{"x-access-token":tok||token}});
+      const res=await fetch(`${SERVER}/ctrader/accounts/proto`,{headers:{"x-access-token":tok||token}});
       const data=await res.json();
       const accs=data.data||data||[];
       localStorage.setItem("ct_accounts",JSON.stringify(accs));
