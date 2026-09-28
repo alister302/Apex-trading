@@ -49,6 +49,7 @@ if (window.location.search.includes("code=")) handleDerivCallback();
 
 // cTrader OAuth callback handler
 async function handleCtraderCallback() {
+  console.log("CTRADER CALLBACK TRIGGERED", window.location.href);
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
   if (!code) return;
@@ -62,6 +63,7 @@ async function handleCtraderCallback() {
     });
     const data = await res.json();
     const tok = data.accessToken || data.access_token;
+  console.log("CTRADER TOKEN RESPONSE:", JSON.stringify(data));
     if (tok) {
       localStorage.setItem("ct_token", tok);
       localStorage.setItem("return_tab", "ctrader");
