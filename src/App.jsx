@@ -26,11 +26,11 @@ async function handleDerivCallback() {
   const code = params.get("code");
   const state = params.get("state");
   if (!code) return;
-  const storedState = sessionStorage.getItem("oauth_state");
+  const storedState = localStorage.getItem("oauth_state");
   if (state !== storedState) { console.error("State mismatch"); return; }
-  const codeVerifier = sessionStorage.getItem("pkce_code_verifier");
-  sessionStorage.removeItem("pkce_code_verifier");
-  sessionStorage.removeItem("oauth_state");
+  const codeVerifier = localStorage.getItem("pkce_code_verifier");
+  localStorage.removeItem("pkce_code_verifier");
+  localStorage.removeItem("oauth_state");
   try {
     const res = await fetch("https://princex-api.onrender.com/deriv/token", {
       method: "POST",
