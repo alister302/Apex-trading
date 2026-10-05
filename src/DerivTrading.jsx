@@ -5,9 +5,19 @@ const DERIV_CLIENT_ID = "34ADv1yDaQ6kPm1R32fsl";
 const REDIRECT_URI = "https://princex-iq.vercel.app";
 
 async function buildOAuthURL() {
-  const state = Math.random().toString(36).slice(2);
-  sessionStorage.setItem("oauth_state", state);
-  return `https://auth.deriv.com/oauth2/auth?response_type=code&client_id=${DERIV_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage&state=${state}&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256`;
+  const array = crypto.getRandomValues(new Uint8Array(64));
+  const codeVerifier = Array.from(array)
+    .map(v => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'[v % 66])
+    .join('');
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
+  const codeChallenge = btoa(String.fromCharCode(...new Uint8Array(hash)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const state = crypto.getRandomValues(new Uint8Array(16))
+    .reduce((s,b) => s + b.toString(16).padStart(2,'0'), '');
+  localStorage.setItem('pkce_code_verifier', codeVerifier);
+  localStorage.setItem('oauth_state', state);
+  localStorage.setItem('return_tab', 'derivtrade');
+  return `https://auth.deriv.com/oauth2/auth?response_type=code&client_id=${DERIV_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
 }
 
 const SYMBOLS = [
@@ -61,26 +71,21 @@ export default function DerivTrading({ dark }) {
     border:dark?"#0d2a42":"#d0dce8", muted:dark?"#8899aa":"#445566", dim:dark?"#445566":"#778899",
   };
 
-  // Handle OAuth callback + token from App.jsx
+  // Load token on mount
   useEffect(()=>{
-    const savedToken = localStorage.getItem("deriv_access_token");
-    if (savedToken) {
-      setToken(savedToken);
-      fetchDerivAccounts(savedToken);
+    const tok = localStorage.getItem("deriv_access_token");
+    const err = localStorage.getItem("deriv_token_error");
+    if (err) { 
+      setError("Auth failed: " + err); 
+      localStorage.removeItem("deriv_token_error"); 
     }
+    if (tok) { setToken(tok); fetchDerivAccounts(tok); }
     const onStorage = () => {
-      const tok = localStorage.getItem("deriv_access_token");
-      if (tok && !token) { setToken(tok); fetchDerivAccounts(tok); }
+      const t2 = localStorage.getItem("deriv_access_token");
+      if (t2) { setToken(t2); fetchDerivAccounts(t2); }
     };
     window.addEventListener("storage", onStorage);
-    // Also poll localStorage every second for 10s after load
-    let attempts = 0;
-    const poll = setInterval(() => {
-      const tok = localStorage.getItem("deriv_access_token");
-      if (tok) { setToken(tok); fetchDerivAccounts(tok); clearInterval(poll); }
-      if (++attempts > 10) clearInterval(poll);
-    }, 1000);
-    return () => { window.removeEventListener("storage", onStorage); clearInterval(poll); };
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   // Connect WebSocket when account selected
