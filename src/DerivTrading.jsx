@@ -290,7 +290,7 @@ export default function DerivTrading({ dark }) {
                 ✅ From $0.50 per trade<br/>
                 ✅ Instant payouts
               </div>
-              <button className="dbtn" onClick={async()=>{ const url = await buildOAuthURL(); window.location.href=url; }}
+              <button className="dbtn" onClick={async()=>{ localStorage.setItem("return_tab","derivtrade"); const url = await buildOAuthURL(); window.location.href=url; }}
                 style={{ padding:"16px 32px", background:"linear-gradient(135deg,#ff444f,#cc2233)", color:"#fff",
                   borderRadius:10, fontSize:14, letterSpacing:2, width:"100%", marginBottom:10 }}>
                 🔗 CONNECT DERIV ACCOUNT

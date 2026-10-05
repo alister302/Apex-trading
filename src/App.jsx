@@ -40,7 +40,9 @@ async function handleDerivCallback() {
     const data = await res.json();
     if (data.access_token) {
       localStorage.setItem("deriv_access_token", data.access_token);
+      localStorage.setItem("return_tab", "derivtrade");
       window.history.replaceState({}, "", "/");
+      window.dispatchEvent(new Event("storage"));
       window.location.reload();
     }
   } catch(e) { console.error("Token exchange failed", e); }
