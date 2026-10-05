@@ -45,7 +45,7 @@ async function handleDerivCallback() {
     }
   } catch(e) { console.error("Token exchange failed", e); }
 }
-if (window.location.search.includes("code=")) handleDerivCallback();
+if (window.location.search.includes("code=") && !window.location.search.includes("state=")) handleDerivCallback();
 
 // cTrader OAuth callback handler
 async function handleCtraderCallback() {
@@ -53,7 +53,7 @@ async function handleCtraderCallback() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
   if (!code) return;
-  if (window.location.pathname !== "/callback") return;
+  // removed pathname check - handled by search params
   window.history.replaceState({}, "", "/");
   try {
     const res = await fetch("https://princex-api.onrender.com/ctrader/exchange-token", {
@@ -72,7 +72,7 @@ async function handleCtraderCallback() {
     }
   } catch(e) { console.error("cTrader token exchange failed", e); }
 }
-if (window.location.pathname === "/callback") handleCtraderCallback();
+if (window.location.search.includes("code=") && window.location.search.includes("state=")) handleCtraderCallback();
 
 
 const GEMINI_KEY = "AIzaSyDLXA3uOQuQmJQanhcSQmCnPqaAJL2l4xU";
