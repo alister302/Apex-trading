@@ -70,30 +70,21 @@ export default function DerivTrading({ dark }) {
     border:dark?"#0d2a42":"#d0dce8", muted:dark?"#8899aa":"#445566", dim:dark?"#445566":"#778899",
   };
 
-  // Handle OAuth callback
+  // Handle OAuth callback + token from App.jsx
   useEffect(()=>{
-    const params = new URLSearchParams(window.location.search);
-    const token1 = params.get("token1");
-    const accs = [];
-    let i = 1;
-    while(params.get(`token${i}`)) {
-      accs.push({
-        token: params.get(`token${i}`),
-        loginid: params.get(`acct${i}`),
-        currency: params.get(`cur${i}`),
-      });
-      i++;
+    // New PKCE flow - token already saved by App.jsx
+    const savedToken = localStorage.getItem("deriv_access_token");
+    if (savedToken) {
+      setToken(savedToken);
+      fetchDerivAccounts(savedToken);
     }
-    if (token1 && accs.length > 0) {
-      window.history.replaceState({}, "", "/");
-      localStorage.setItem("deriv_access_token", data.access_token);
-      localStorage.setItem("deriv_accounts", JSON.stringify(accs));
-      setToken(token1);
-      setAccounts(accs);
-      setActiveAcc(accs[0]);
-    } else if (token && accounts.length > 0) {
-      setActiveAcc(accounts[0]);
-    }
+    // Listen for token saved by App.jsx
+    const onStorage = () => {
+      const tok = localStorage.getItem("deriv_access_token");
+      if (tok) { setToken(tok); fetchDerivAccounts(tok); }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   // Connect WebSocket when account selected
@@ -205,6 +196,27 @@ export default function DerivTrading({ dark }) {
   const sellContract = (contractId) => {
     if (!wsRef.current || wsRef.current.readyState !== 1) return;
     wsRef.current.send(JSON.stringify({ sell: contractId, price: 0 }));
+  };
+
+  const fetchDerivAccounts = async (tok) => {
+    try {
+      const res = await fetch("https://princex-api.onrender.com/deriv/accounts", {
+        headers: { "Authorization": "Bearer " + tok }
+      });
+      const data = await res.json();
+      const accs = Array.isArray(data) ? data : (data.accounts || data.data || []);
+      if (accs.length > 0) {
+        localStorage.setItem("deriv_accounts", JSON.stringify(accs));
+        setAccounts(accs);
+        setActiveAcc(accs[0]);
+      } else {
+        // Fallback — connect WS directly with token
+        setActiveAcc({ token: tok, loginid: "account", currency: "USD" });
+      }
+    } catch(e) {
+      // Fallback — use token directly for WS
+      setActiveAcc({ token: tok, loginid: "account", currency: "USD" });
+    }
   };
 
   const logout = () => {
