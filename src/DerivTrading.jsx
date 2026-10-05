@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const SERVER = "https://princex-api.onrender.com";
-const DERIV_CLIENT_ID = "33UkT2qA409Ez6jqg3tW0";
+const DERIV_CLIENT_ID = "34ADv1yDaQ6kPm1R32fsl";
 const REDIRECT_URI = "https://princex-iq.vercel.app";
 
 async function buildOAuthURL() {
