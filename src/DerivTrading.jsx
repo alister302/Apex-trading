@@ -72,19 +72,24 @@ export default function DerivTrading({ dark }) {
 
   // Handle OAuth callback + token from App.jsx
   useEffect(()=>{
-    // New PKCE flow - token already saved by App.jsx
     const savedToken = localStorage.getItem("deriv_access_token");
     if (savedToken) {
       setToken(savedToken);
       fetchDerivAccounts(savedToken);
     }
-    // Listen for token saved by App.jsx
     const onStorage = () => {
       const tok = localStorage.getItem("deriv_access_token");
-      if (tok) { setToken(tok); fetchDerivAccounts(tok); }
+      if (tok && !token) { setToken(tok); fetchDerivAccounts(tok); }
     };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    // Also poll localStorage every second for 10s after load
+    let attempts = 0;
+    const poll = setInterval(() => {
+      const tok = localStorage.getItem("deriv_access_token");
+      if (tok) { setToken(tok); fetchDerivAccounts(tok); clearInterval(poll); }
+      if (++attempts > 10) clearInterval(poll);
+    }, 1000);
+    return () => { window.removeEventListener("storage", onStorage); clearInterval(poll); };
   }, []);
 
   // Connect WebSocket when account selected
