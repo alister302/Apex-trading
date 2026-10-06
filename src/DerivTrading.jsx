@@ -48,6 +48,138 @@ const DURATIONS = [
 
 const STAKES = [0.5, 1, 2, 5, 10, 25, 50, 100];
 
+
+// ─── Deriv Live Chart ─────────────────────────────────────────────────────────
+function DerivLiveChart({ ticks, candles, chartType, setChartType, price, dark, symbol, wsStatus }) {
+  const canvasRef = useRef(null);
+
+  const bgCard = dark?"#0a1520":"#fff";
+  const border = dark?"#0d2a42":"#d0dce8";
+  const gridC  = dark?"#0d2a4233":"#d0dce833";
+  const txt    = dark?"#8899aa":"#445566";
+
+  useEffect(()=>{
+    const canvas = canvasRef.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+    const PAD = 10, PAXIS = 70, PB = 22;
+    const chartW = W - PAXIS, chartH = H - PB - PAD;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = bgCard; ctx.fillRect(0,0,W,H);
+
+    if (chartType === "line" && ticks.length > 1) {
+      const prices = ticks.map(t=>t.p);
+      const maxP = Math.max(...prices), minP = Math.min(...prices);
+      const range = maxP - minP || 0.001;
+      const toY = p => PAD + ((maxP-p)/range) * chartH;
+      const toX = i => (i/(ticks.length-1)) * chartW;
+
+      // Grid
+      for (let i=0;i<=4;i++) {
+        const y = PAD + (i/4)*chartH;
+        ctx.strokeStyle=gridC; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(chartW,y); ctx.stroke();
+        ctx.fillStyle=txt; ctx.font="8px monospace";
+        ctx.fillText((maxP-(i/4)*range).toFixed(symbol?.symbol?.includes("JPY")?3:5), chartW+3, y+3);
+      }
+
+      // Gradient fill
+      const grad = ctx.createLinearGradient(0,PAD,0,PAD+chartH);
+      grad.addColorStop(0,"#ff444f44"); grad.addColorStop(1,"#ff444f00");
+      ctx.beginPath();
+      ticks.forEach((tk,i)=>{ const x=toX(i),y=toY(tk.p); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.lineTo(toX(ticks.length-1), PAD+chartH);
+      ctx.lineTo(0, PAD+chartH); ctx.closePath();
+      ctx.fillStyle=grad; ctx.fill();
+
+      // Line
+      ctx.strokeStyle="#ff444f"; ctx.lineWidth=1.5; ctx.beginPath();
+      ticks.forEach((tk,i)=>{ const x=toX(i),y=toY(tk.p); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.stroke();
+
+      // Current price dot
+      if (ticks.length>0) {
+        const last=ticks[ticks.length-1];
+        const x=toX(ticks.length-1), y=toY(last.p);
+        ctx.fillStyle="#ff444f"; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#ffd700"; ctx.fillRect(chartW,y-8,PAXIS,16);
+        ctx.fillStyle="#000"; ctx.font="bold 8px monospace";
+        ctx.fillText(last.p.toFixed(5), chartW+3, y+3);
+      }
+
+    } else if (chartType === "candle" && candles.length > 1) {
+      const maxP = Math.max(...candles.map(c=>c.h));
+      const minP = Math.min(...candles.map(c=>c.l));
+      const range = maxP - minP || 0.001;
+      const toY = p => PAD + ((maxP-p)/range)*chartH;
+      const cw = Math.max(2, Math.floor(chartW/candles.length)-1);
+      const toX = i => Math.floor(i*(chartW/candles.length));
+
+      // Grid
+      for (let i=0;i<=4;i++) {
+        const y=PAD+(i/4)*chartH;
+        ctx.strokeStyle=gridC; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(chartW,y); ctx.stroke();
+        ctx.fillStyle=txt; ctx.font="8px monospace";
+        ctx.fillText((maxP-(i/4)*range).toFixed(5), chartW+3, y+3);
+      }
+
+      // Candles
+      candles.forEach((c,i)=>{
+        const x=toX(i), bull=c.c>=c.o, col=bull?"#00dd55":"#ff3355";
+        ctx.strokeStyle=col; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(x+cw/2,toY(c.h)); ctx.lineTo(x+cw/2,toY(c.l)); ctx.stroke();
+        ctx.fillStyle=col;
+        const by=Math.min(toY(c.o),toY(c.c));
+        ctx.fillRect(x,by,cw,Math.max(1,Math.abs(toY(c.c)-toY(c.o))));
+      });
+
+      // Price badge
+      if (candles.length>0) {
+        const last=candles[candles.length-1];
+        const y=toY(last.c);
+        ctx.setLineDash([3,3]); ctx.strokeStyle="#ffffff33"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(chartW,y); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle="#ffd700"; ctx.fillRect(chartW,y-8,PAXIS,16);
+        ctx.fillStyle="#000"; ctx.font="bold 8px monospace";
+        ctx.fillText(last.c.toFixed(5), chartW+3, y+3);
+      }
+    } else {
+      // No data yet
+      ctx.fillStyle=txt; ctx.font="11px monospace"; ctx.textAlign="center";
+      ctx.fillText(wsStatus==="connected"?"Collecting data...":"Connect to see chart", W/2, H/2);
+      ctx.textAlign="left";
+    }
+  },[ticks, candles, chartType, dark, bgCard, gridC, txt]);
+
+  const btnS = (a) => ({
+    padding:"4px 10px", background:a?"#ff444f22":"transparent",
+    border:`1px solid ${a?"#ff444f":border}`, color:a?"#ff444f":txt,
+    borderRadius:5, fontSize:9, cursor:"pointer", fontFamily:"monospace", fontWeight:700
+  });
+
+  return (
+    <div style={{background:bgCard, border:`1px solid ${border}`, borderRadius:12, overflow:"hidden", marginBottom:12}}>
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 12px", borderBottom:`1px solid ${border}`}}>
+        <div style={{display:"flex", alignItems:"center", gap:6}}>
+          <span style={{fontSize:9, color:"#ff444f", fontWeight:700}}>📊 LIVE</span>
+          <span style={{fontSize:8, color:txt}}>{ticks.length} ticks</span>
+          {wsStatus==="connected" && <div style={{width:6,height:6,borderRadius:"50%",background:"#00dd55",animation:"blink 1s infinite"}}/>}
+        </div>
+        <div style={{display:"flex", gap:4}}>
+          <button onClick={()=>setChartType("line")} style={btnS(chartType==="line")}>📈 Line</button>
+          <button onClick={()=>setChartType("candle")} style={btnS(chartType==="candle")}>🕯 Candle</button>
+        </div>
+      </div>
+      <canvas ref={canvasRef} width={900} height={220}
+        style={{width:"100%", height:220, display:"block"}}
+      />
+    </div>
+  );
+}
+
 export default function DerivTrading({ dark }) {
   const [token,        setToken]        = useState(localStorage.getItem("deriv_access_token")||null);
   const [accounts,     setAccounts]     = useState(JSON.parse(localStorage.getItem("deriv_accounts")||"[]"));
@@ -63,8 +195,14 @@ export default function DerivTrading({ dark }) {
   const [openContracts,setOpenContracts]= useState([]);
   const [error,        setError]        = useState("");
   const [proposal,     setProposal]     = useState(null);
-  const wsRef = useRef(null);
-  const priceTimer = useRef(null);
+  const [chartType, setChartType] = useState("line");
+  const [ticks,     setTicks]     = useState([]);
+  const [candles,   setCandles]   = useState([]);
+  const canvasRef   = useRef(null);
+  const wsRef       = useRef(null);
+  const priceTimer  = useRef(null);
+  const ticksRef    = useRef([]);
+  const candleRef   = useRef(null);
 
   const t = {
     bg:dark?"#050a0f":"#f0f4f8", bgCard:dark?"rgba(0,20,40,0.9)":"#fff",
@@ -125,7 +263,24 @@ export default function DerivTrading({ dark }) {
 
       if (d.msg_type === "tick") {
         clearTimeout(priceTimer.current);
-        priceTimer.current = setTimeout(()=>setPrice(d.tick?.quote), 200);
+        const q = d.tick?.quote;
+        const ts = d.tick?.epoch * 1000 || Date.now();
+        priceTimer.current = setTimeout(()=>setPrice(q), 200);
+        if (q) {
+          const newTick = { t: ts, p: q };
+          ticksRef.current = [...ticksRef.current.slice(-299), newTick];
+          setTicks([...ticksRef.current]);
+          // Build 1-min candles
+          const minTs = Math.floor(ts / 60000) * 60000;
+          setCandles(prev => {
+            const last = prev[prev.length - 1];
+            if (last && last.t === minTs) {
+              const updated = { ...last, h: Math.max(last.h, q), l: Math.min(last.l, q), c: q };
+              return [...prev.slice(-99), updated];
+            }
+            return [...prev.slice(-99), { t: minTs, o: q, h: q, l: q, c: q }];
+          });
+        }
       }
 
       if (d.msg_type === "proposal") {
@@ -315,7 +470,11 @@ export default function DerivTrading({ dark }) {
               </div>
             )}
 
-            {/* Balance */}
+    
+        {/* Live Chart */}
+        <DerivLiveChart ticks={ticks} candles={candles} chartType={chartType} setChartType={setChartType} price={price} dark={dark} symbol={symbol} wsStatus={wsStatus} />
+
+        {/* Balance */}
             {balance && (
               <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10,
                 padding:"12px 14px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
