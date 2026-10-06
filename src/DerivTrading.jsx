@@ -290,9 +290,8 @@ export default function DerivTrading({ dark }) {
           </div>
         )}
 
-        {/* LOGGED IN */}
-
-        {token && (
+        {/* TRADING UI - always visible */}
+        {(
           <div>
             {/* Account selector */}
             {accounts.length > 0 && (
