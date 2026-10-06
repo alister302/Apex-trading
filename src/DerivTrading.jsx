@@ -276,56 +276,22 @@ export default function DerivTrading({ dark }) {
           </div>
         )}
 
-        {/* NOT LOGGED IN */}
+        {/* Connect banner */}
         {!token && (
-          <div>
-            <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:12, padding:"28px 20px", textAlign:"center", marginBottom:16 }}>
-              <div style={{ fontSize:52, marginBottom:12 }}>📈</div>
-              <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:16, fontWeight:900, color:dark?"#fff":"#001133", marginBottom:8 }}>
-                TRADE RISE & FALL
-              </div>
-              <div style={{ fontSize:10, color:t.muted, lineHeight:1.9, marginBottom:24 }}>
-                ✅ Trade directly on Deriv<br/>
-                ✅ Real & Demo accounts<br/>
-                ✅ Volatility indices 24/7<br/>
-                ✅ From $0.50 per trade<br/>
-                ✅ Instant payouts
-              </div>
-              <button className="dbtn" onClick={async()=>{ localStorage.setItem("return_tab","derivtrade"); const url = await buildOAuthURL(); window.location.href=url; }}
-                style={{ padding:"16px 32px", background:"linear-gradient(135deg,#ff444f,#cc2233)", color:"#fff",
-                  borderRadius:10, fontSize:14, letterSpacing:2, width:"100%", marginBottom:10 }}>
-                🔗 CONNECT DERIV ACCOUNT
-              </button>
-              <a href="https://deriv.com/signup/" target="_blank" rel="noopener noreferrer"
-                style={{ display:"block", padding:"12px", background:"transparent",
-                  border:`1px solid ${t.border}`, color:t.muted, borderRadius:8,
-                  fontSize:11, textDecoration:"none", textAlign:"center" }}>
-                Don't have Deriv? Sign up free →
-              </a>
+          <div style={{ background:"#1a0010", border:"2px solid #ff444f44", borderRadius:10, padding:"12px 16px", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+            <div>
+              <div style={{ fontSize:10, color:"#ff444f", fontWeight:700 }}>⚠ NOT CONNECTED</div>
+              <div style={{ fontSize:8, color:t.muted, marginTop:2 }}>Connect your Deriv account to trade</div>
             </div>
-
-            <div style={{ background:t.bgCard, border:`1px solid ${t.border}`, borderRadius:10, padding:"14px 16px" }}>
-              <div style={{ fontSize:10, color:"#ff444f", fontWeight:700, marginBottom:10 }}>HOW IT WORKS</div>
-              {[
-                ["1","Connect your Deriv account (real or demo)"],
-                ["2","Select volatility pair and duration"],
-                ["3","Set your stake amount"],
-                ["4","Tap RISE or FALL to place trade"],
-                ["5","Win payout if prediction is correct"],
-              ].map(([n,s])=>(
-                <div key={n} style={{ display:"flex", gap:10, marginBottom:8, alignItems:"center" }}>
-                  <div style={{ width:22,height:22,borderRadius:"50%",background:"#ff444f22",border:"1px solid #ff444f44",
-                    display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
-                    <span style={{ fontSize:9, color:"#ff444f", fontWeight:900 }}>{n}</span>
-                  </div>
-                  <span style={{ fontSize:10, color:t.muted }}>{s}</span>
-                </div>
-              ))}
-            </div>
+            <button className="dbtn" onClick={async()=>{ localStorage.setItem("return_tab","derivtrade"); const url = await buildOAuthURL(); window.location.href=url; }}
+              style={{ padding:"10px 18px", background:"linear-gradient(135deg,#ff444f,#cc2233)", color:"#fff", borderRadius:8, fontSize:11, letterSpacing:1, fontWeight:700 }}>
+              🔗 CONNECT DERIV
+            </button>
           </div>
         )}
 
         {/* LOGGED IN */}
+
         {token && (
           <div>
             {/* Account selector */}
